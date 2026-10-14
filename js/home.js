@@ -436,10 +436,7 @@ window.addEventListener('scroll', requestTick);
 document.addEventListener('keydown', function(e) {
     // Tecla ESC cierra el menú móvil
     if (e.key === 'Escape') {
-        const navLinks = document.getElementById('navLinks');
-        const mobileMenu = document.getElementById('mobileMenu');
-        navLinks.classList.remove('active');
-        mobileMenu.classList.remove('active');
+        document.getElementById('navbar')?.classList.remove('active');
     }
 
     // Tecla Enter en elementos de preguntas frecuentes

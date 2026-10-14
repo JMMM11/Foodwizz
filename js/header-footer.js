@@ -27,7 +27,9 @@ fetch('/Pages/footer.html')
 fetch('/Pages/chatbot.html')
         .then(res => res.text())
         .then(html => {
-            document.getElementById('chatbot-container').innerHTML = html;
+            const chatbotContainer = document.getElementById('chatbot-container');
+            if (!chatbotContainer) return; // páginas sin chatbot (políticas)
+            chatbotContainer.innerHTML = html;
             // Si tu JS necesita inicialización
             if (typeof initChatbot === 'function') {
                 initChatbot();

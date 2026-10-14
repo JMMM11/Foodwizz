@@ -226,8 +226,12 @@ h1 {
         padding: 0 20px;
     }
 
+    /* !important: el h1 global de arriba también lo usa */
+    h1 {
+        font-size: 2rem !important;
+    }
+
     .text-content h1 {
-        font-size: .5rem; /* Títulos grandes en móvil */
         text-align: center;
         line-height: 1.2;
     }

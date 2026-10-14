@@ -67,3 +67,9 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Editor local history, Python caches, browser test output
+.history/
+__pycache__/
+*.pyc
+.playwright-mcp/

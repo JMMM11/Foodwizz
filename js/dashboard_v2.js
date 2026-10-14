@@ -24,7 +24,7 @@ const fmtUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'US
 const TZ = 'America/Panama';
 let sales4wChart = null;
 let tickets7dChart = null;
-const ZIP_PATH = '../assets/FoodWizz-Portable-Universal.zip';
+const ZIP_PATH = '../assets/app/FoodWizz-Portable-Universal.zip';
 
 function setAvatarSrc(imgEl, url) {
   if (!imgEl || !url) return;
