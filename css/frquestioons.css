@@ -1,35 +1,21 @@
-    /* Splash Screen */
-    .splash-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      opacity: 1;
-      transition: opacity 1s ease-in-out;
-    }
-    .splash-screen.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .splash-logo {
-      width: 500px;
-      max-width: 90vw;
-      filter: drop-shadow(0 0 32px #DDAA00);
-      animation: pulse 2s ease-in-out;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.8); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+/* =====================================================
+   FAQ - Página de preguntas frecuentes
+   ===================================================== */
 
-/* Isotipo en botones */
+/* Fondo con la foto de soporte; el padding superior deja espacio al header fijo */
+.backpic {
+  background-image: url('/assets/img/Soporte.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 140px 20px 80px;
+}
+
+.faq-section {
+  padding: 0;
+}
+
+/* Títulos blancos sobre la foto */
 .section-title,
 .section-subtitle {
   color: white;
@@ -37,138 +23,106 @@
   font-weight: bold;
 }
 
-
-
-/* FAQ Page Styles - Sección de Preguntas Frecuentes */
-
-/* Section of Frequently Asked Questions */
-
-.backpic {
-  background-image: url('/assets/img/Soporte.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 60px 20px;
-  margin-top: -40px;
-}
-
-
-.faq-section {
-    padding: 0;
-}
-
+/* El acordeón va a la derecha para no tapar a la persona de la foto */
 .faq-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-    margin-top: 3rem;
-    margin-right: -650px;
-    margin-left: 630px;
+  max-width: 600px;
+  margin: 3rem 0 0 auto;
 }
 
-/* Accordion */
+/* ================= Acordeón ================= */
 .faq-accordion {
-    background: white;
-    border-radius: 20px;
-    box-shadow: var(--shadow-soft);
-    overflow: hidden;
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
 }
 
 .faq-accordion .accordion-item {
-    border: none;
-    border-bottom: 1px solid #f0f0f0;
-    background: transparent;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  background: transparent;
 }
 
 .faq-accordion .accordion-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .faq-accordion .accordion-button {
-    background: white;
-    border: none;
-    padding: 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--gray-dark);
-    text-align: left;
-    transition: all var(--transition-fast);
-    position: relative;
-    overflow: hidden;
+  background: white;
+  border: none;
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-dark);
+  text-align: left;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
 }
 
 .faq-accordion .accordion-button:hover {
-    background: #f8f9fa;
-    color: var(--vibrant-orange);
+  background: #f8f9fa;
+  color: var(--golden-yellow);
 }
 
+/* Pregunta abierta */
 .faq-accordion .accordion-button:not(.collapsed) {
-    background: var(--vibrant-orange);
-    color: white;
-    box-shadow: 0 8px 25px rgba(255, 127, 13, 0.4);
+  background: var(--golden-yellow);
+  color: white;
+  box-shadow: 0 8px 25px rgba(255, 127, 13, 0.4);
 }
 
 .faq-accordion .accordion-button:focus {
-    box-shadow: none;
-    border: none;
+  box-shadow: none;
+  border: none;
 }
 
+.faq-accordion .accordion-button:focus-visible {
+  outline: 3px solid var(--golden-yellow);
+  outline-offset: -3px;
+}
+
+/* Oculta la flecha por defecto de Bootstrap */
 .faq-accordion .accordion-button::after {
-    display: none;
+  display: none;
 }
 
 .faq-accordion .accordion-body {
-    padding: 1.5rem;
-    background: #f8f9fa;
-    color: var(--gray-dark);
-    line-height: 1.7;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  color: var(--gray-dark);
+  line-height: 1.7;
 }
 
-/* Icon in buttons */
+/* Isotipo dentro de cada pregunta: negro, y blanco cuando la pregunta está abierta */
 .faq-icon-small {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
-/* Image */
-.faq-image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+.faq-accordion .accordion-button:not(.collapsed) .faq-icon-small {
+  filter: brightness(0) invert(1);
 }
 
-.faq-image .customer-service-image {
-    max-width: 100%;
-    height: auto;
-    max-height: 600px;
-    border-radius: 20px;
-    box-shadow: var(--shadow-medium);
-    transition: transform var(--transition-medium);
-    object-fit: contain;
+/* ================= Responsive ================= */
+@media (max-width: 992px) {
+  .faq-content {
+    margin: 2rem auto 0;
+  }
 }
 
-.faq-image .customer-service-image:hover {
-    transform: scale(1.05);
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-    .faq-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .faq-accordion .accordion-button {
-        padding: 1rem;
-        font-size: 1rem;
-    }
-    
-    .faq-accordion .accordion-body {
-        padding: 1rem;
-    }
-}
+  .backpic {
+    padding: 110px 12px 50px;
+  }
 
+  .faq-accordion .accordion-button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .faq-accordion .accordion-body {
+    padding: 1rem;
+  }
+}

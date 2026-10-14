@@ -10,8 +10,8 @@
     <!-- Preconecta a Google Fonts para cargar las fuentes más rápido -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Importa las fuentes Poppins e Inter de Google Fonts -->
-    
+    <!-- Fuente Montserrat (Google Fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <!-- Importa Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap CSS -->
@@ -24,28 +24,24 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
     <link rel="stylesheet" href="/css/chatbot.css">
     <!-- Importa el favicon -->
-    <link rel="shortcut icon" href="assets/logos/IconoNaranja_Transp.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="/assets/logos/IconoNaranja_Transp.svg" type="image/x-icon">
     <script src="/js/header-footer.js"></script>
     <script src="/js/bannercookies.js"></script>
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+        /* Tipografía base del Home */
         * {
             font-family: 'Montserrat', sans-serif;
         }
-        h1{
-            font-size: 16px;
-        }
-        p{
+        p {
             font-size: 14px;
         }
     </style>
-    
 </head>
 <body>
     <!-- ===================== HEADER ==================== -->
-    <!-- Barra de navegación -->
+    <!-- Se carga desde Pages/header.html (js/header-footer.js) -->
     <div id="header-placeholder"></div>
 
     <!-- ===================== COOKIES ==================== -->
@@ -76,7 +72,7 @@
                                 </div>
                     </div>
                     <div class="image-content">
-                        <img src="assets/img/banner-img.png" alt="autostyle-slider-car1">
+                        <img src="/assets/img/banner-img.png" alt="Burger ingredients floating over an orange circle">
                     </div>
                     </div>
                 </div>
@@ -92,7 +88,7 @@
                     </div>
 
                     <div class="image-content">
-                        <img src="assets/img/carrito1.png" alt="autostyle-slider-car2">
+                        <img src="/assets/img/carrito1.png" alt="FoodWizz food truck">
                     </div>
                     </div>
                 </div>
@@ -112,7 +108,7 @@
                         </div>
                     </div>
                     <div class="image-content">
-                        <img src="assets/img/compuapp.png" alt="autostyle-slider-car3">
+                        <img src="/assets/img/compuapp.png" alt="FoodWizz dashboard on a laptop and a monitor">
                     </div>
                     </div>
                 </div>
@@ -137,12 +133,12 @@
             How We Help?
             </h1>
             <div class="fw-banners-container">
-                <a href="javascript:void(0);" class="fw-banner-box">
-                    <img src="/assets/img/01.jpg" alt="">
-                </a>
-                <a href="javascript:void(0);" class="fw-banner-box">
-                    <img src="/assets/img/02.jpg" alt="">
-                </a>
+                <div class="fw-banner-box">
+                    <img src="/assets/img/01.jpg" alt="Boost sales to the level">
+                </div>
+                <div class="fw-banner-box">
+                    <img src="/assets/img/02.jpg" alt="Reduce waste, save resources">
+                </div>
             </div>
         </div>
     </div>
@@ -154,7 +150,7 @@
                 <div class="main-banner-wrapper">
                     <div class="fw-banner-left">
                         <div class="people-images">
-                            <img src="assets/img/cta-img.png" alt="People with headsets">
+                            <img src="/assets/img/cta-img.png" alt="FoodWizz support team with headsets">
                         </div>
                         <div class="orange-background"></div>
                     </div>
@@ -186,7 +182,7 @@
     <!-- =================== CHATBOT ==================== -->
     <div id="chatbot-container"></div>
 
-    <!-- ===================== FOOTER ==================== = -->
+    <!-- ===================== FOOTER ==================== -->
     <div id="footer-placeholder"></div>
 
     <!-- ===================== EXTERNAL SCRIPTS ==================== -->

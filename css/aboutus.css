@@ -1,6 +1,6 @@
 :root {
     
-    --golden-yellow:#FF7F0D;;
+    --golden-yellow:#FF7F0D;
     --teal-blue: #000000;
     --dark-navy: #000000;
     --cream-white: #fcfcfc;
@@ -38,6 +38,7 @@
     --transition-slow: 0.8s ease;
 }
 
+/* Reset solo dentro de la página About */
 .aboutusc * {
     margin: 0;
     padding: 0;
@@ -77,23 +78,6 @@ img {
     background-size: cover;
     background-position: center bottom;
     align-items: center;
-}
-
-.header-txt span {
-    font-size: 18px;
-    text-transform: capitalize;
-    color: #FFF;
-    font-weight: 600;
-    margin-bottom: 15px;
-    display: block;
-}
-
-.header-txt h1 {
-    font-size: 70px;
-    color: #FF7F0D;
-    margin-bottom: 20px;
-    margin-top: 20px;
-    line-height: 1;
 }
 
 .header-txt p {
@@ -139,10 +123,6 @@ p{
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.6);
     color: #fff;
     transform: translateY(-3px);
-}
-
-.header-img {
-    flex-basis: 50%;
 }
 
 .values {
@@ -208,10 +188,6 @@ h3 {
     align-items: center;
 }
 
-.foowizz-img {
-    flex-basis: 50%;
-}
-
 .foodwizz-txt {
     flex-basis: 50%;
     padding-left: 50px;
@@ -256,11 +232,6 @@ h3 {
     margin-bottom: 2rem;
 }
 
-.card-emoji {
-    font-size: 3rem;
-    animation: emojiFloat 3s ease-in-out infinite;
-}
-
 .card-header h3 {
     font-size: 2rem;
     font-weight: 700;
@@ -288,63 +259,6 @@ h3 {
 .floating-card:hover .card-decoration {
     transform: scale(1.5);
     opacity: 0.2;
-}
-
-@keyframes emojiFloat {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-10px) rotate(5deg);
-    }
-}
-
-.card-front {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    border-radius: 25px;
-    padding: 2rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.card-front{
-    background-color: #FF7F0D;
-}
-
-.card-front h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: var(--cream-white);
-    text-align: justify;
-    margin: 12px;
-}
-
-.card-front p {
-    color: rgba(254, 250, 224, 0.8);
-    font-size: 1rem;
-}
-
-
-.middle-card .software-icon {
-    color: #FF7F0D; /* Naranja */
-}
-.middle-card .card-front {
-    background-color: white; /* Fondo blanco solo para la carta del medio */
-}
-
-.middle-card .card-front h3 {
-    color: #000000; /* Opcional: cambiar el color del título para que contraste */
-}
-
-.middle-card .card-front p {
-    color: #000000 !important; 
 }
 
 .history {
@@ -477,243 +391,125 @@ h3 {
     padding: 0;
 }
 
-@keyframes taglineGlow {
-    0%, 100% {
-        text-shadow: 0 0 5px currentColor;
-        transform: scale(1);
-    }
-    50% {
-        text-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
-        transform: scale(1.05);
-    }
-}
-
-
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-
-.scroll-animate {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: all 0.8s ease;
-}
-
-.scroll-animate.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
 @media (max-width: 1024px) {
-    .hero-container {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
-    }
-    
-    .floating-dashboard {
-        width: 400px;
-        height: 400px;
-    }
-    
     .mission-vision-grid {
         grid-template-columns: 1fr;
         gap: 2rem;
     }
+
+    .history {
+        padding: 50px 40px;
+    }
 }
 
 @media (max-width: 768px) {
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
+    h1 {
+        font-size: 28px;
+    }
+
+    .header-content {
+        padding: 120px 20px 60px;
+    }
+
+    .header-txt {
+        flex-basis: 100%;
+    }
+
+    .main_logo {
+        max-width: 220px;
+    }
+
+    .values,
+    .whoweare {
         width: 100%;
-        background: rgba(254, 250, 224, 0.98);
-        backdrop-filter: blur(20px);
+        padding: 60px 16px 0;
+    }
+
+    /* Columnas apiladas en lugar de 3 en fila */
+    .aboutusc .row {
         flex-direction: column;
-        padding: 2rem;
-        box-shadow: var(--shadow-medium);
+        margin-left: 0;
+        margin-right: 0;
     }
-    
-    .nav-links.active {
-        display: flex;
+
+    .aboutusc .row > * {
+        width: 100%;
+        padding: 0;
     }
-    
-    .mobile-menu {
-        display: flex;
+
+    .values-col,
+    .whoweare-col,
+    .stories-col {
+        flex-basis: auto;
+        margin-bottom: 20px;
     }
-    
-    .hero-title {
-        font-size: 2.5rem;
+
+    .values-col {
+        padding: 20px;
     }
-    
-    .tagline-text {
-        font-size: 1.5rem;
+
+    .values_titles {
+        font-size: 28px;
     }
-    
-    .tagline-highlight {
-        font-size: 2rem;
-    }
-    
-    .floating-dashboard {
-        width: 300px;
-        height: 300px;
-    }
-    
-    .dashboard-card {
-        width: 140px;
-        height: 100px;
-        padding: 1rem;
-    }
-    
-    .section-title {
-        font-size: 2.5rem;
-    }
-    
-    .features-grid,
-    .help-grid,
-    .software-features,
-    .pricing-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .footer-tagline {
-        font-size: 2rem;
+
+    .foodwizz {
         flex-direction: column;
-        gap: 0.5rem;
+        padding: 30px 16px 60px;
     }
-}
 
-@media (max-width: 480px) {
-    .nav-container {
-        padding: 0 1rem;
+    .foodwizz-txt {
+        padding-left: 0;
+        margin-top: 20px;
     }
-    
-    .hero-title {
-        font-size: 2rem;
+
+    .why-we-exist {
+        margin-bottom: 60px;
+        padding: 0 16px;
     }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
+
+    .floating-card {
+        padding: 2rem 1.5rem;
     }
-    
-    .tagline-text {
-        font-size: 1.3rem;
+
+    .card-header h3 {
+        font-size: 1.6rem;
     }
-    
-    .tagline-highlight {
-        font-size: 1.8rem;
+
+    .history {
+        padding: 40px 16px;
     }
-    
-    .hero-buttons {
+
+    .history-content {
         flex-direction: column;
-        gap: 1rem;
     }
-    
-    .floating-dashboard {
-        width: 250px;
-        height: 250px;
-    }
-    
-    .dashboard-card {
-        width: 120px;
-        height: 80px;
-        padding: 0.8rem;
-        font-size: 0.9rem;
-    }
-    
-    .section {
-        padding: 3rem 0;
-    }
-    
-    .container {
-        padding: 0 1rem;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .contact-form {
-        padding: 2rem;
-    }
-    
-    .footer-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-}
 
+    .history-img {
+        margin: 20px 0 0;
+    }
 
-.text-center {
-    text-align: center;
-}
+    /* Sin hover en pantallas táctiles: el título de cada foto siempre visible */
+    .layer {
+        background: rgba(255, 127, 13, 0.4);
+    }
 
-.text-gradient {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+    .layer h3 {
+        opacity: 1;
+        transform: none;
+        font-size: 20px;
+        padding: 0 12px;
+    }
 
-.glow-effect {
-    box-shadow: var(--shadow-glow);
-}
+    .stories {
+        width: 100%;
+        padding: 60px 16px;
+    }
 
-.hover-lift:hover {
-    transform: translateY(-5px);
-}
-
-.hover-scale:hover {
-    transform: scale(1.05);
-}
-
-.fade-in {
-    animation: fadeInUp 1s ease-out;
+    .banner {
+        width: auto;
+        margin: 60px 16px;
+        padding: 60px 20px;
+    }
 }

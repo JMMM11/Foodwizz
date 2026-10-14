@@ -1,3 +1,8 @@
+/* =====================================================
+   CONTACT US - Formulario, departamentos, banner y mapa
+   ===================================================== */
+
+/* Formulario a la izquierda, tarjetas de departamentos a la derecha */
 .contact-section {
   display: flex;
   justify-content: center;
@@ -6,7 +11,7 @@
   margin-top: 5%;
 }
 
-/* ============= Contact Form ============= */
+/* ============= Formulario ============= */
 .contact-form {
   background: white;
   padding: 30px;
@@ -30,7 +35,7 @@
   margin-bottom: 15px;
 }
 
-.contact-form input, 
+.contact-form input,
 .contact-form textarea {
   width: 100%;
   padding: 12px;
@@ -58,7 +63,7 @@
   background: #e69500;
 }
 
-/* ============= Department Cards ============= */
+/* ============= Tarjetas de departamentos ============= */
 .departments {
   display: flex;
   flex-direction: column;
@@ -66,7 +71,7 @@
   flex: 1;
 }
 
-.card {
+.departments .card {
   display: flex;
   flex-direction: row;
   background: white;
@@ -74,85 +79,86 @@
   border-radius: 12px;
   box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
   align-items: center;
-  gap: 10%;
+  gap: 1.25rem;
+  border: none;
   border-left: 4px solid orange;
 }
 
-.card img {
+.departments .card img {
   width: 40px;
   height: 40px;
+  flex-shrink: 0;
 }
 
-.card h3 {
+.departments .card h3 {
   margin: 0;
   font-size: 18px;
 }
 
-.card p {
+.departments .card p {
   margin: 4px 0;
   font-size: 14px;
   color: #555;
+  overflow-wrap: anywhere; /* el correo no cabe entero en pantallas angostas */
 }
 
-/* ============= Map ============= */
+/* ============= Banner ============= */
+.bannercontact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 40px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bannercontact-img {
+  display: block;
+  width: 100%;
+  max-width: 1200px;
+  height: auto;
+}
+
+/* ============= Mapa dentro de la laptop ============= */
+/* El mapa se posiciona en % sobre la imagen para que escale con ella */
 .laptop-container {
   position: relative;
-  width: 800px;
+  width: 100%;
+  max-width: 1000px;
   margin: auto;
 }
 
 .laptop-image {
-  width: 150%;
+  width: 100%;
   display: block;
-  margin-left: -150px;
 }
 
 .map-overlay {
   position: absolute;
-  top: 16%;   /* Ajusta según el diseño de la laptop */
-  left: 41%;  /* Ajusta según el diseño de la laptop */
-  width: 76%; /* Ajusta según el tamaño de la pantalla */
+  top: 16%;
+  left: 39.8%;
+  width: 50.7%;
   height: 65%;
   border: none;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
-.backpic2 {
-  background-image: url('/assets/img/compu.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 60px 20px;
-  margin-top: -40px;
-}
-
 /* ============= Responsive ============= */
-@media (max-width: 768px) {
-    .faq-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .faq-accordion .accordion-button {
-        padding: 1rem;
-        font-size: 1rem;
-    }
-    
-    .faq-accordion .accordion-body {
-        padding: 1rem;
-    }
-}
+@media (max-width: 900px) {
+  .contact-section {
+    flex-direction: column;
+    padding: 110px 16px 30px;
+    margin-top: 0;
+    gap: 24px;
+  }
 
-.bannercontact {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
-    border-radius: 8px; 
-    margin-left: 40px;
-    margin-right: 40px;
+  .form-row {
+    flex-direction: column;
+  }
+
+  .bannercontact {
+    margin: 20px 16px;
+  }
 }

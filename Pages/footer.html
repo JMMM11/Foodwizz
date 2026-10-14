@@ -132,7 +132,7 @@
     /* ===== Móvil ===== */
     @media (max-width: 767px) {
         .footer-container {
-            grid-template-columns: 1fr;
+            grid-template-columns: minmax(0, 1fr);
             gap: 2rem;
             text-align: center; /* centra todo */
             justify-content: center;
@@ -197,10 +197,15 @@
             max-width: 90%;
         }
 
+        .footer-links {
+            margin-left: 0;
+        }
+
         /* Redes sociales centradas y más grandes */
         .footer-socials {
             justify-content: center;
-            gap: 3rem;
+            flex-wrap: wrap;
+            gap: 1.25rem;
             margin-top: 20px;
         }
 

@@ -26,7 +26,7 @@
 </head>
 <body>
 
-  <!-- ===================== HEADER ==================== = -->
+  <!-- ===================== HEADER ==================== -->
   <div id="header-placeholder"></div>
   
   <!-- ===================== HERO ==================== -->
@@ -35,16 +35,15 @@
       <h1>Never Run Out Again.</h1>
       <p class="hero-subtitle-software">FoodWizz is the smart way to keep your inventory under control. No stress, no waste, no surprises. Just fresh products, perfectly organized, and always on hand when you need them. </p>
     </div>
-    </div>
     <div class="hero-circle">
-      <img src="../assets/img/tableta.png" alt="Decoración" class="hero-img">
+      <img src="../assets/img/tableta.png" alt="FoodWizz on a tablet" class="hero-img">
     </div>
   </section>
-  <section class="banner">
-  </section>
+  <!-- Banner "What makes our software stand out" (imagen de fondo en software.css) -->
+  <section class="banner"></section>
 
-  <!-- ================= INPUTS SECTION ================= -->
-  <!-- Inputs invisibles -->
+  <!-- ================= FUNCIONES (Graphics / Alerts / Dishes) ================= -->
+  <!-- Radios ocultos: cada círculo de la derecha marca uno y el CSS muestra su texto e imagen -->
   <input type="radio" name="drink" id="drink1" checked>
   <input type="radio" name="drink" id="drink2">
   <input type="radio" name="drink" id="drink3">
@@ -70,34 +69,57 @@
 
     <!-- Imagen central -->
     <div class="main-image">
-      <img src="../assets/img/graphics.png" class="img1" height="300px"> 
-      <img src="../assets/img/alerts.png" class="img2"> 
-      <img src="../assets/img/dishes.png" class="img3">
+      <img src="../assets/img/graphics.png" class="img1" alt="Reports and charts screen">
+      <img src="../assets/img/alerts.png" class="img2" alt="Stock alerts screen">
+      <img src="../assets/img/dishes.png" class="img3" alt="Dishes and recipes screen">
     </div>
 
     <!-- Miniaturas -->
     <div class="side-images">
       <label for="drink1" class="circle">
-        <img src="../assets/logos/graficas.png" alt="Drink 1">
+        <img src="../assets/logos/graficas.png" alt="Show Graphics">
       </label>
       <span class="click-here-message">Click here!</span>
       <label for="drink2" class="circle">
-        <img src="../assets/logos/alertas.jpg" alt="Drink 2">
+        <img src="../assets/logos/alertas.jpg" alt="Show Alerts">
       </label>
       <span class="click-here-message">Click here!</span>
       <label for="drink3" class="circle">
-        <img src="../assets/logos/hamburger.png"  alt="Drink 3">
+        <img src="../assets/logos/hamburger.png"  alt="Show Dishes">
       </label>
       <span class="click-here-message">Click here!</span>
     </div>
   </div>
 
-  <!-- ===== VIDEO TUTORIAL ABOUT OF THE SOFTWARE ===== -->
+  <!-- ===================== DOWNLOAD APP ==================== -->
+  <section class="download-section" id="download">
+    <div class="download-card">
+      <div class="download-text">
+        <span class="download-tag">Free download</span>
+        <h2>Take FoodWizz to your kitchen</h2>
+        <p>Download the portable version of FoodWizz and start organizing your ingredients, dishes and stock alerts today. Everything you see on this page, ready to use on your own computer.</p>
+        <ol class="download-steps">
+          <li>Download the ZIP file.</li>
+          <li>Extract it to any folder on your computer.</li>
+          <li>Open FoodWizz and start tracking your inventory.</li>
+        </ol>
+        <a href="../assets/app/FoodWizz-Portable-Universal.zip" download class="download-cta">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Download FoodWizz
+        </a>
+        <span class="download-meta">Portable version &middot; ZIP &middot; 9 MB</span>
+      </div>
+      <div class="download-image">
+        <img src="../assets/img/compuapp.png" alt="FoodWizz dashboard shown on a laptop">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VIDEO TUTORIAL ==================== -->
   <section class="section">
     <div class="testimonials-container">
       <header class="section-header">
         <h2>Video Tutorial</h2>
-        <video src="../assets/app/funcionalidad.mp4" controls></video>
+        <video src="../assets/app/funcionalidad.mp4" controls preload="metadata" playsinline></video>
       </header>
     </div>
   </section>
@@ -149,30 +171,30 @@
     </div>
     <div class="testimonials-container">
       <header class="section-header">
-        <video src="../assets/app/Video_Interview.mp4" controls></video>
+        <video src="../assets/app/Video_Interview.mp4" controls preload="metadata" playsinline></video>
       </header>
     </div>
     </section>
 
   <script src="../js/Testimonials.js"></script>
+  <script>
+    // Aparición suave al hacer scroll; sin JS el contenido queda visible
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+      }), { threshold: 0.15 });
+      document.querySelectorAll('.download-section, .section').forEach(el => {
+        el.classList.add('reveal');
+        io.observe(el);
+      });
+    }
+  </script>
     
   <!-- ===================== FOOTER ==================== = -->
   <div id="footer-placeholder"></div>
     
         <!-- =================== CHATBOT ==================== -->
     <div id="chatbot-container"></div>
-    <!-- Aquí se cargará el chatbot que está en chatbot.html -->
-    <script>
-        fetch('/Pages/chatbot.html')
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('chatbot-container').innerHTML = html;
-            // Si tu JS necesita inicialización
-            if (typeof initChatbot === 'function') {
-                initChatbot();
-            }
-        });
-    </script>
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
