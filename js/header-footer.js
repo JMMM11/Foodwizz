@@ -1,5 +1,5 @@
 // =====================================================
-// FRAGMENTOS COMPARTIDOS - header, footer y chatbot
+// FRAGMENTOS COMPARTIDOS - header y footer
 // Se carga en el <head> de todas las páginas.
 // =====================================================
 
@@ -34,14 +34,4 @@ loadFragment('Pages/header.html').then(html => {
 // Footer
 loadFragment('Pages/footer.html').then(html => {
     document.getElementById('footer-placeholder').innerHTML = html;
-});
-
-// Chatbot (solo en las páginas que tienen el contenedor)
-loadFragment('Pages/chatbot.html').then(html => {
-    const chatbotContainer = document.getElementById('chatbot-container');
-    if (!chatbotContainer) return;
-    chatbotContainer.innerHTML = html;
-    if (typeof initChatbot === 'function') {
-        initChatbot();
-    }
 });
