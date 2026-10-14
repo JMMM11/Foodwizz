@@ -4,7 +4,7 @@
 
 /* Fondo con la foto de soporte; el padding superior deja espacio al header fijo */
 .backpic {
-  background-image: url('/assets/img/Soporte.png');
+  background-image: url('../assets/img/Soporte.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

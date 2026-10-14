@@ -2,9 +2,8 @@
 // PLANES DE PRECIOS - Tarjetas que se voltean (Home)
 // =====================================================
 
-// Carga las tarjetas de planes (Pages/Aditional/tarjeta.html) en el Home
-fetch('/Pages/Aditional/tarjeta.html')
-    .then(response => response.text())
+// Carga las tarjetas de planes (Pages/Aditional/tarjeta.html) en el Home; loadFragment viene de header-footer.js
+loadFragment('Pages/Aditional/tarjeta.html')
     .then(data => {
         document.getElementById('pricesplans-placeholder').innerHTML = data;
     });

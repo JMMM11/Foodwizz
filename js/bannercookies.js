@@ -1,7 +1,6 @@
 // Show banner only if no cookie preference is set
 if (document.cookie.indexOf("cookieAccepted=") === -1) {
-    fetch('/Pages/Policy/cookies.html')
-        .then(response => response.text())
+    loadFragment('Pages/Policy/cookies.html')
         .then(data => {
             document.getElementById('cookie-placeholder').innerHTML = data;
 
