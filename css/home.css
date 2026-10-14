@@ -1,0 +1,265 @@
+/* Contenedor de la información principal */
+.carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+.carousel-images {
+    display: flex;
+    width: 100%; /* 2 imágenes */
+    transition: transform 0.7s cubic-bezier(.77,0,.18,1);
+}
+.carousel-image {
+    min-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+.carousel-image.active {
+    display: block;
+}
+.carousel-content {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    min-height: 100vh; 
+    padding: 40px 60px;
+}
+.carrito-img {
+    max-width: 100%;   
+    border-radius: 0;
+    box-shadow: none;
+    position: relative; 
+}
+
+.carousel-content2 {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    min-height: 100vh; 
+    transform: translateX(0px);
+
+}
+
+.carousel-btn{
+    height: 5%;
+    border-radius: 100% !important;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    opacity: 0.7;
+}
+.carousel-btn.prev {
+    left: 10px;
+}
+.carousel-btn.next {
+    right: 10px;
+}
+
+.carrusel-circle1{
+    position: absolute;
+    transform: translateX(400px);
+    width: 1000px;
+    height: 1000px;
+    background: orange;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    z-index: -1;
+}
+.px_home_slider_wrapper {
+    background-image: url("/assets/img/banner-bg.jpg"); /* tu imagen de fondo */
+    background-size: cover;       /* ajusta la imagen para cubrir todo */
+    background-position: center;  /* centra la imagen */
+    background-attachment: fixed; /* hace que quede fija al hacer scroll */
+    background-repeat: no-repeat; /* evita que se repita */
+}
+
+/*****************************************
+    Home Slider CSS
+/* Carrusel con fondo */
+.px_home_slider_wrapper {
+    background: url("../assets/img/banner-bg.jpg") no-repeat center center;
+    background-size: cover;
+    height: 100vh;   /* fondo ocupa toda la pantalla */
+    width: 100%;
+    display: flex;
+    align-items: center; /* centra verticalmente */
+}
+
+/* Cada slide (contenedor de texto + imagen) */
+.px_home_slider .item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+    padding: 0 80px;
+}
+
+/* Texto a la izquierda */
+.text-content {
+    flex: 1;
+    color: #000000;
+}
+
+h1 {
+    font-size: 48px !important;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.text-content p {       
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* Imagen a la derecha */
+.image-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-content img {
+    max-width: 115%;
+    height: auto;
+}
+
+/* Swiper ajustes generales */
+.swiper {
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: hidden;
+    list-style: none;
+    padding: 0;
+    z-index: 1;
+    display: block;
+}
+
+/* Botones Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+    color: #fff;
+    font-size: 20px;
+}
+
+.fw-btn-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 20px;
+}
+
+.fw-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    background: #FF7F0D;
+    color: white;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+/* ===== Responsive Tablets ===== */
+@media (max-width: 1199px) and (min-width: 768px) {
+    .px_home_slider_wrapper {
+        height: auto; /* Ajusta altura automáticamente */
+        padding: 60px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 100px;
+    }
+
+    .px_home_slider .item {
+        flex-direction: column; /* Texto e imagen apilados */
+        gap: 30px;
+        padding: 0 40px;
+    }
+
+    .text-content h1 {
+        font-size: 2em; /* Título más pequeño que desktop */
+        text-align: center;
+    }
+
+    .text-content p {
+        font-size: 1em;
+        text-align: center;
+    }
+
+    .image-content img {
+        max-width: 90%;
+        height: auto;
+    }
+
+    .fw-btn-wrap {
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .fw-btn {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}
+
+/* ===== Responsive Móviles ===== */
+@media (max-width: 767px) {
+    .px_home_slider_wrapper {
+        height: auto;
+        padding: 40px 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 5em;
+    }
+
+    .px_home_slider .item {
+        flex-direction: column; /* Apila todo vertical */
+        gap: 20px;
+        padding: 0 20px;
+    }
+
+    .text-content h1 {
+        font-size: .5rem; /* Títulos grandes en móvil */
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .text-content p {
+        font-size: 1em; /* Texto más grande y legible */
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .image-content img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .fw-btn-wrap {
+        flex-direction: column; /* Botones uno debajo del otro */
+        gap: 15px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .fw-btn {
+        width: 100%; /* Botones ocupan todo el ancho */
+        padding: 1rem 0;
+        font-size: 1rem; /* Texto grande para móviles */
+        text-align: center;
+    }
+
+    /* Ajuste botones Swiper */
+    .swiper-button-next,
+    .swiper-button-prev {
+        font-size: 18px;
+    }
+}

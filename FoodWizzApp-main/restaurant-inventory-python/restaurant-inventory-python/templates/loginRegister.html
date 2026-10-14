@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodWizz - Sign In / Sign Up</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../static/css/login.css">
+
+    <link rel="shortcut icon" href="../assets/logos/IconoNaranja_Transp.svg" type="image/x-icon"> 
+</head>
+
+<body>
+    <a href="/restaurant-inventory-python/restaurant-inventory-python/app.py"><img class="logoFW" src="../static/images/logo_N.png" alt="Logo FoodWizz"></a>
+<!--SIMAGE-->
+    <div class="container" id="container">
+
+        <!-- SIGN UP -->
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <div class="form-header">
+                    <p>Start your journey</p>
+                    <h1>Sign Up to FoodWizz</h1>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-email">E-mail</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="signup-email" placeholder="example@email.com" required>
+                        <i class="ri-mail-line input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="signup-password" placeholder="••••••••" required>
+                        <i class="ri-eye-off-line input-icon password-toggle"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="primary-btn">Sign Up</button>
+
+                <div class="divider">or sign in with</div>
+
+                <div class="social-login">
+                        <a href="https://www.facebook.com/" class="social-btn">
+                        <i class="ri-facebook-circle-fill"></i>
+                        </a>
+
+                        <a href="https://www.google.com/" class="social-btn">
+                        <i class="ri-google-fill"></i>
+                        </a>
+
+                        <a href="https://www.apple.com/" class="social-btn">
+                        <i class="ri-apple-fill"></i>
+                        </a>
+                </div>
+
+                <p class="bottom-link">Have an account? <a href="#" id="signInLink">Sign in</a></p>
+            </form>
+        </div>
+
+        <!-- SIGN IN -->
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <div class="form-header">
+                    <p>Welcome back!</p>
+                    <h1>Sign In to FoodWizz</h1>
+                </div>
+
+                <div class="form-group">
+                    <label for="signin-email">E-mail or user</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="signin-email" placeholder="example@email.com" required>
+                        <i class="ri-mail-line input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signin-password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="signin-password" placeholder="••••••••" required>
+                        <i class="ri-eye-off-line input-icon password-toggle"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="primary-btn">Sign In</button>
+
+                <div class="social-login">
+                    <a href="#" class="social-btn"><i class="ri-facebook-circle-fill"></i></a>
+                    <a href="#" class="social-btn"><i class="ri-google-fill"></i></a>
+                    <a href="#" class="social-btn"><i class="ri-apple-fill"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- OVERLAY -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Already have an account?</h1>
+                    <p>Sign in to stay connected and continue your journey with us.</p>
+                    <button class="ghost-btn" id="signInOverlay">Sign In</button>
+                </div>
+
+                <div class="overlay-panel overlay-right">
+                    <img src="../static/images/IconoNaranja_Transp.png" class="foodwizz-legend" width="250" height="250" style="margin-top: -60px;">
+                    <h2 class="foodwizz-legend">
+                        Inventory out of control? 
+                        <br>Our platform helps you organize everything.</br>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

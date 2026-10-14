@@ -1,0 +1,52 @@
+:root {
+    --golden-yellow:#FF7F0D;;
+    --teal-blue: #000000;
+    --dark-navy: #000000;
+    --cream-white: #fcfcfc;
+    --olive-green: #FF7F0D;
+    --vibrant-orange: #0b0b0b;
+
+    --white: #FFFFFF;
+    --black: #000000;
+    --gray-light: #F5F5F5;
+    --gray-dark: #333333;
+    
+    --gradient-primary: linear-gradient(135deg, var(--golden-yellow), var(--vibrant-orange));
+    --gradient-secondary: linear-gradient(135deg, var(--teal-blue), var(--dark-navy));
+    --gradient-accent: linear-gradient(135deg, var(--olive-green), var(--teal-blue));
+    --gradient-glow: radial-gradient(circle, rgba(221, 170, 0, 0.3), transparent);
+
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 0 30px rgba(221, 170, 0, 0.4);
+
+    --font-primary: 'Montserrat', sans-serif;
+    --font-secondary: 'Roboto', sans-serif;
+
+    --section-padding: 5rem 0;
+    --container-padding: 0 2rem;
+
+    --transition-fast: 0.3s ease;
+    --transition-medium: 0.5s ease;
+    --transition-slow: 0.8s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-primary);
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+body {
+    line-height: 1.6;
+    color: var(--gray-dark);
+    overflow-x: hidden;
+    background: var(--cream-white);
+}

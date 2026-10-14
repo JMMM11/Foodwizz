@@ -1,0 +1,297 @@
+<head>
+    <style>
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+
+    :root {
+        --dark-background: #1a1a1a;
+        --text-color: #f0f0f0;
+        --link-color: #c9c9c9;
+        --orange-accent: #ff9900;
+        --footer-padding: 60px 20px;
+    }
+
+    .footer {
+        background-color: var(--dark-background);
+        color: var(--text-color);
+    }
+
+    .footer-container {
+        display: grid;
+        gap: 40px; 
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--footer-padding);
+    }
+
+    /* Estilos generales */
+    .footer-about { 
+        max-width: 300px; 
+    } 
+    .footer-logo-container { 
+        margin-bottom: 20px; 
+    } 
+
+    .footer-logo { 
+        height: 40px; 
+    } 
+
+    .footer-about p { 
+        color: var(--link-color); 
+        line-height: 1.6; font-size: 0.9em; 
+    } 
+    .footer-socials { 
+        margin-top: 20px; 
+        display: flex; 
+        gap: 15px; 
+    } 
+    .footer-socials a { 
+        list-style: none; 
+        text-decoration: none !important; 
+        display: inline-flex; 
+        justify-content: center; 
+        align-items: center; 
+        width: 40px; 
+        height: 40px; 
+        background-color: #2b2b2b; 
+        border-radius: 50%; 
+        color: var(--link-color); 
+        font-size: 1rem; 
+        transition: background-color 0.3s, color 0.3s; 
+    } 
+    .footer-socials a:hover { 
+        background-color: var(--orange-accent); 
+        color: var(--dark-background); 
+    } 
+    .footer-links{ 
+        margin-left: 4%; 
+    } 
+    .footer-links h3, .footer-newsletter h3 { 
+        font-size: 1em; 
+        margin-bottom: 25px; 
+        font-weight: bold; 
+        position: relative; 
+        text-transform: uppercase; 
+    } 
+    .footer-links h3::after, 
+    .footer-newsletter h3::after { 
+        content: ''; 
+        position: absolute; 
+        left: 0; 
+        bottom: -10px; 
+        width: 50px; 
+        height: 3px; 
+        background-color: var(--orange-accent); 
+    } 
+    .footer-links ul { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0; 
+    } 
+    .footer-links li { 
+        margin-bottom: 15px; 
+    } 
+    .footer-links li::before{ 
+        content: "—"; 
+        color: #fff; 
+        padding-right: 5px; 
+    } 
+    .footer-links a { 
+        text-decoration: none; 
+        color: var(--link-color); 
+        transition: color 0.3s; 
+        font-size: 0.8em; 
+    } 
+    .footer-links a:hover { 
+        color: var(--text-color); 
+    } 
+    .footer-newsletter p { 
+        color: var(--link-color); line-height: 1.6; margin-bottom: 20px; font-size: 0.9em; 
+    } 
+    .footer-newsletter-form { 
+        display: flex; border-radius: 5px; overflow: hidden; width: 100%; 
+    } 
+    .footer-newsletter-form input { 
+        flex-grow: 1; padding: 15px 20px; border: none; outline: none; background-color: #2b2b2b; color: var(--text-color); font-size: 0.75em; 
+    } 
+    .footer-newsletter-form input::placeholder { 
+        color: #888; 
+    } 
+    .footer-newsletter-form button { 
+        width: 60px; background-color: var(--orange-accent); border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background-color 0.3s; 
+    } 
+    .footer-newsletter-form button i { 
+        color: #fff; font-size: .9em; 
+    } 
+    .footer-newsletter-form button:hover { 
+        background-color: #e58700; 
+    } 
+    .footer-bottom { 
+        text-align: center; padding: 20px; font-size: 0.7em; color: #888; border-top: 1px solid #2b2b2b; 
+    }
+
+    /* ===== Móvil ===== */
+    @media (max-width: 767px) {
+        .footer-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            text-align: center; /* centra todo */
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Títulos más grandes */
+        .footer-links h3,
+        .footer-newsletter h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links h3::after, 
+        .footer-newsletter h3::after { 
+            content: ''; 
+            position: absolute; 
+            left: 0; 
+            bottom: -10px; 
+            width: 50%; 
+            height: 3px; 
+            background-color: var(--orange-accent); 
+            left: 50%;
+            transform: translateX(-50%);
+        } 
+
+        .footer-logo {
+            height: 3rem !important;
+        }
+
+        /* Párrafos y links más grandes */
+        .footer-about p,
+        .footer-newsletter p,
+        .footer-links a {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Formulario vertical y centrado */
+        .footer-newsletter-form {
+            flex-direction: right;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .footer-newsletter-form input {
+            font-size: 1rem;
+            padding: 1rem 1rem;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 20rem;
+        }
+
+        .footer-newsletter-form button {
+            width: 20%;
+            max-width: 200px;
+            padding: 2rem 0;
+        }
+
+        .footer-about, .footer-newsletter {
+            margin: 0 auto;
+            max-width: 90%;
+        }
+
+        /* Redes sociales centradas y más grandes */
+        .footer-socials {
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 20px;
+        }
+
+        .footer-socials a {
+            font-size: 2rem !important;
+            color: var(--link-color); 
+        }
+        .footer-bottom { 
+        font-size: 25px; 
+    }
+    }
+
+    /* ===== Tablet ===== */
+    @media (min-width: 768px) and (max-width: 1199px) {
+        .footer-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .footer-about p,
+        .footer-newsletter p,
+        .footer-links a {
+            font-size: 0.95em;
+        }
+
+        .footer-newsletter-form input {
+            font-size: 0.9em;
+        }
+
+        .footer-newsletter-form button {
+            width: 60px;
+        }
+    }
+
+    /* ===== Desktop ===== */
+    @media (min-width: 1200px) {
+        .footer-container {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    </style>
+</head>
+
+
+
+<!-- Footer de la página -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-section footer-about">
+            <div class="footer-logo-container">
+                <img src="/assets/logos/logo_B.svg" alt="Foodwizz Logo" class="footer-logo">
+            </div>
+            <p>At Foodwizz, we make inventory management easy and stress-free. Our smart software helps you keep the right stock, cut waste, save money, and run your business more smoothly.</p>
+            <div class="footer-socials">
+                <a href="https://www.facebook.com/profile.php?id=61580612240962" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/foodwizz.co?igsh=MWVqbXRqbGsyZWdjMA%3D%3D" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/in/foodwizz-foodwizz-b01a89382" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://wa.me/50765892359" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://x.com/FoodwizzCh" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+
+            </div>
+        </div>
+        <div class="footer-section footer-links">
+            <h3>Helpful Links</h3>
+            <ul>
+                <li><a href="/Pages/Policy/termscond.html">Terms and Conditions</a></li>
+                <li><a href="/Pages/Policy/privatepol.html">Privacy Policy</a></li>
+                <li><a href="/Pages/Policy/cookiespol.html">Cookies Policy</a></li>
+                <li><a href="/Pages/Policy/accessibility.html">Accessibility</a></li>
+            </ul>
+        </div>
+        <div class="footer-section footer-links">
+            <h3>Meet Us</h3>
+            <ul>
+                <li><a href="/Pages/aboutus.html">About Us</a></li>
+                <li><a href="/Pages/Fqr.html">FAQs</a></li>
+                <li><a href="/Pages/ContactUS.html">Contact Us</a></li>
+                <li><a href="/Pages/software.html">Discover</a></li>
+            </ul>
+        </div>
+        <div class="footer-section footer-newsletter">
+            <h3>Subscribe to Our Newsletter</h3>
+            <p>Stay updated with the latest news and smart tips on inventory management!
+            <br>Subscribe with us today and be the first to receive exclusive updates, insights, and special offers.</p>
+            <form class="footer-newsletter-form">
+                <input type="email" placeholder="Enter Your Email.." aria-label="Enter your email address" style="margin-bottom: 0;">
+                <button type="submit" aria-label="Subscribe"><i class="fas fa-arrow-right"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>2025 Copyright ©FoodWizz All Right Reserved.</p>
+    </div>
+</footer>

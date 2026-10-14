@@ -1,0 +1,131 @@
+<head>
+<style>
+    /* === BANNER === */
+    .cookie-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff8e1;
+        color: #333;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', sans-serif;
+        z-index: 9999;
+    }
+    .cookie-content {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        text-align: center;
+    }
+    .cookie-content h4 {
+        margin-bottom: 10px;
+        font-size: 1.2em;
+        color: #d35400;
+    }
+    .cookie-content p {
+        font-size: 0.95em;
+        margin-bottom: 15px;
+    }
+    .cookie-buttons button {
+        margin: 5px;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .cookie-buttons button:hover {
+        background-color: #f0f0f0;
+    }
+    .cookie-buttons .accept {
+        background-color: #27ae60;
+        color: white;
+    }
+    .cookie-buttons .accept:hover {
+        background-color: #219150;
+    }
+
+    /* === MODAL === */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+        background: white;
+        width: 90%;
+        max-width: 500px;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: left;
+    }
+    .modal-content h3 {
+        margin-bottom: 15px;
+        color: #d35400;
+    }
+    .modal-content label {
+        display: block;
+        margin: 10px 0;
+    }
+    .modal-buttons {
+        text-align: right;
+        margin-top: 20px;
+    }
+    .modal-buttons button {
+        margin-left: 10px;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .save {
+        background: #27ae60;
+        color: white;
+    }
+</style>
+</head>
+
+<body>
+    <!-- BANNER -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <h4>Privacy at Foodwizz</h4>
+            <p>
+                We use cookies to personalize content and ads, provide social media features, and analyze traffic. 
+                We share information with our advertising, social media, and analytics partners.
+                <a href="/Pages/Policy/cookiespol.html" style="margin-left: 10px;">Learn more</a>
+            </p>
+            <div class="cookie-buttons">
+                <button class="preferences" onclick="openModal()">Customize cookies</button>
+                <button onclick="setCookiePreference('rechazar')">Reject all</button>
+                <button class="accept" onclick="setCookiePreference('aceptar')">Accept all cookies</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIGURACIÓN -->
+    <div class="modal" id="cookieModal">
+        <div class="modal-content">
+            <h3>Cookie Preferences</h3>
+            <form id="cookieForm">
+                <!-- todo en inglés -->
+                <label><input type="checkbox" checked disabled> Necessary cookies (always active)</label>
+                <label><input type="checkbox" name="analiticas"> Analytics cookies</label>
+                <label><input type="checkbox" name="marketing"> Marketing cookies</label>
+            </form>
+            <div class="modal-buttons">
+                <button onclick="closeModal()">Cancel</button>
+                <button class="save" onclick="savePreferences()">Save</button>
+            </div>
+        </div>
+    </div>
+</body>

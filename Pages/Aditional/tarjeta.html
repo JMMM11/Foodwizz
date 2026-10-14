@@ -1,0 +1,489 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+    .pricing-section * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-weight: bold;
+        font-family: 'montserrat', sans-serif;
+    }
+
+    .pricing-section {
+        font-weight: bold;
+        background: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .pricing-section .container {
+        max-width: 1200px;
+        width: 100%;
+        text-align: center;
+        overflow: visible;
+    }
+
+    .pricing-section .main-title {
+        color: black;
+        font-size: 48px;
+        font-weight: bold;
+        margin-bottom: 3rem;
+    }
+
+    .pricing-section .cards-container {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 2rem 0;
+        overflow: visible;
+    }
+
+    .pricing-section .card {
+        width: 300px;
+        height: 400px;
+        perspective: 1000px;
+        cursor: pointer;
+        position: relative;
+        border: none;
+    }
+
+    .pricing-section .featured-card {
+        transform: scale(1.10);
+        z-index: 10;
+        border: none;
+    }
+
+
+    .pricing-section .featured-card.flipped {
+        transform: scale(1);
+    }
+
+    .pricing-section .featured-card .card-back {
+        transform: rotateY(180deg);
+    }
+
+    .pricing-section .card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+    }
+
+    .pricing-section .card.flipped .card-inner {
+        transform: rotateY(180deg);
+        transition: 0.8s;
+    }
+
+    .pricing-section .card-front, .pricing-section .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .pricing-section .card-front:hover, .pricing-section .card-back:hover {
+        transform: translateY(-1.1);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .pricing-section .card-back {
+        transform: rotateY(180deg);
+        transition: 0.8s;
+    }
+
+    /* Estilos para Basic Plan */
+    .pricing-section .basic-card {
+        background: white;
+        color: black;
+    }
+
+    .pricing-section .basic-card-back {
+        background: white;
+        color: black;
+    }
+
+    /* Estilos para Wizz Plan (Destacado) */
+    .pricing-section .wizz-card {
+        background: #FF7F0D;
+        color: white;
+    }
+
+    .pricing-section .wizz-card-back {
+        background: #FF7F0D;
+        color: white;
+    }
+
+
+    .pricing-section .top-hat {
+        position: absolute;
+        top: -35px;
+        right: -25px;
+        z-index: 20;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .pricing-section .top-hat .hat-icon {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+
+    @keyframes float {
+        0%, 80% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* Estilos para Pro Plan */
+    .pricing-section .pro-card {
+        background: white;
+        color: black;
+    }
+
+    .pricing-section .pro-card-back {
+        background: white;
+        color: black;
+    }
+
+    .pricing-section .card-icon {
+        margin-top: 1rem;
+
+        
+    }
+
+    .pricing-section .utensils-icon, .pricing-section .crown-icon, .pricing-section .hat-icon {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-bottom: 1rem;
+    }
+    .pricing-section .plan-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        letter-spacing: 1px;
+    }
+
+    .pricing-section .price {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .pricing-section .buy-btn {
+        background: white;
+        color: black;
+        border: 2px solid black;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .pricing-section .buy-btn:hover {
+        background: black;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .pricing-section .wizz-btn {
+        background: black;
+        color: white;
+        border: 2px solid black;
+    }
+
+    .pricing-section .wizz-btn:hover {
+        background: white;
+        color: black;
+    }
+
+    /* Estilos para el reverso de las tarjetas */
+    .pricing-section .card-back h3 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    .pricing-section .specifications {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+        text-align: left;
+        margin-top: 5px;
+    }
+
+    .pricing-section .spec-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .pricing-section .spec-icon {
+        font-size: 1.2rem;
+        font-weight: bold;
+        min-width: 20px;
+        
+    }
+
+    .pricing-section .price-detail {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: inherit;
+    }
+
+    .pricing-section .buy-btn-back {
+        background: white;
+        color: black;
+        border: 2px solid black;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .pricing-section .buy-btn-back:hover {
+        background: black;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .pricing-section .wizz-btn-back {
+        background: black;
+        color: white;
+        border: 2px solid black;
+    }
+
+    .pricing-section wizz-btn-back:hover {
+        background: white;
+        color: black;
+    }
+
+    /* Responsive Design */
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .pricing-section {
+        margin-top: 5%;
+        padding: 20px 10px;
+        align-items: center;
+    }
+
+    .pricing-section .main-title {
+        font-size: 1rem; /* Título más grande en móvil */
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .pricing-section .cards-container {
+        flex-direction: column;
+        gap: 5rem;
+        align-items: center;
+        border: none;
+    }
+
+    .pricing-section .card {
+        width: 90%;
+        height: 35rem; /* Ajusta altura automáticamente */
+    }
+
+    .pricing-section .plan-name {
+        font-size: 1.5rem; /* Nombre del plan más grande */
+    }
+
+    .pricing-section .price {
+        font-size: 2rem; /* Precio más grande */
+    }
+
+    .pricing-section .buy-btn,
+    .pricing-section .buy-btn-back,
+    .pricing-section .wizz-btn,
+    .pricing-section .wizz-btn-back {
+        font-size: 1.5rem; /* Botones más grandes */
+        padding: 16px 32px;
+    }
+
+    .pricing-section .card-back h3 {
+        font-size: 1.5rem; /* Título del reverso más grande */
+    }
+
+    .pricing-section .spec-item {
+        font-size: 1rem; /* Especificaciones más legibles */
+    }
+
+    .pricing-section .spec-icon {
+        font-size: 2rem;
+    }
+
+    .pricing-section .utensils-icon,
+    .pricing-section .crown-icon,
+    .pricing-section .hat-icon {
+        width: 10rem;
+        height: 10rem;
+    }
+}
+
+</style>
+
+<body>
+    <section class="pricing-section">
+    <div class="container">
+        <h1 class="main-title">Choose Your Plan</h1>
+        
+        <div class="cards-container">
+            <!-- Tarjeta Basic Plan -->
+            <div class="card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front basic-card">
+                        <div class="card-icon">
+                            <img src="../../assets/img/Imagen1.png" alt="Utensils" class="utensils-icon">
+                        </div>
+                        <h2 class="plan-name">BASIC PLAN</h2>
+                        <div class="price">$155</div>
+                        <button class="buy-btn">Learn More</button>
+                    </div>
+                    <div class="card-back basic-card-back">
+                        <h3>BASIC PLAN</h3>
+                        <div class="specifications">
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Software installation</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Basic Inventory tracking</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Email support</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Up to 100 products</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Mobile app access</span>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="buy-btn" onclick="window.location.href='https://buy.stripe.com/test_5kQ00k2rOg3WdNF1e43Ru02';">BUY NOW</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Wizz Plan (Destacada) -->
+            <div class="card featured-card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front wizz-card">
+                        <div class="top-hat">
+                            <img src="../../assets/img/sombrero.png" alt="Top Hat" class="hat-icon">
+                        </div>
+                        <div class="card-icon">
+                            <img src="../../assets/img/estrellas.png" alt="Stars" class="crown-icon" ">
+                        </div>
+                        <h2 class="plan-name">WIZZ PLAN</h2>
+                        <div class="price">$290</div>
+                        <button class="buy-btn wizz-btn">Learn More</button>
+                    </div>
+                    <div class="card-back wizz-card-back">
+                        <h3>WIZZ PLAN</h3>
+                        <div class="specifications">
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Complete acces to all content</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>API access</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Advanced reporting</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>24/7 phone support</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Unlimited products</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="buy-btn" onclick="window.location.href='https://buy.stripe.com/test_5kQaEYc2o3hadNFbSI3Ru00';">BUY NOW</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Pro Plan -->
+            <div class="card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front pro-card">
+                        <div class="card-icon">
+                            <img src="../../assets/img/Imagen1.png" alt="Utensils" class="utensils-icon">
+                        </div>
+                        <h2 class="plan-name">PRO PLAN</h2>
+                        <div class="price">$200</div>
+                        <button class="buy-btn">Learn More</button>
+                    </div>
+                    <div class="card-back pro-card-back">
+                        <h3>PRO PLAN</h3>
+                        <div class="specifications">
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Up to 500 products</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Recipe management</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Cloud backup</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Automated alerts</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-icon">✓</span>
+                                <span>Advanced analytics</span>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="buy-btn" onclick="window.location.href='https://buy.stripe.com/test_eVq3cw4zW04YeRJ4qg3Ru01';">
+                            BUY NOW
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+</body>
+

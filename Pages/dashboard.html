@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodWizz - Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="../js/dashboard_v2.js"></script>
+  <link rel="shortcut icon" href="../assets/logos/IconoNaranja_Transp.svg" type="image/x-icon">
+
+  <style>
+    body { 
+      font-family: 'Montserrat', sans-serif; 
+      margin: 0; 
+      background: #f4f4f4; 
+    }
+    .header { 
+      background: #ff7f00; 
+      padding: 15px; 
+      color: white; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .user-details {
+      text-align: right;
+    }
+    .user-name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .user-email {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .container { 
+      padding: 20px; 
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 10px 0 16px 0;
+    }
+    .controls-row .group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    select {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: white;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 992px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .kpi-grid { grid-template-columns: 1fr; } }
+    .kpi-card {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .kpi-title { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: .06em; }
+    .kpi-value { font-size: 22px; font-weight: 700; margin-top: 6px; }
+    .welcome-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 992px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-card {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .chart-title { font-weight: 600; margin-bottom: 8px; }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: white; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    th, td { 
+      padding: 12px; 
+      border-bottom: 1px solid #ddd; 
+      text-align: left; 
+    }
+    th { 
+      background: #1a1a1a; 
+      color: white; 
+      font-weight: 600;
+    }
+    button { 
+      background: #ff7f00; 
+      border: none; 
+      padding: 10px 20px; 
+      color: white; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background: #e66a00;
+    }
+    .empty-state {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="../assets/logos/logo_N.svg" alt="FoodWizz Logo" style="width: 15%; background-color: #fff; border-radius: 20px; padding: 0.5%;">
+    <h2>Dashboard</h2>
+    <div class="user-info">
+      <img id="userAvatar" src="../assets/logos/IconoNaranja.svg" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #eee;margin-right:10px;">
+      <div class="user-details">
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="user-email" id="userEmail">Loading...</div>
+      </div>
+      <a href="./user.html" style="text-decoration:none;">
+        <button type="button" style="margin-right:8px;">Edit Profile</button>
+      </a>
+      <button data-action="logout">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="welcome-section">
+      <h3>Welcome to your FoodWizz Dashboard!</h3>
+      <p>Manage your food inventory efficiently and track your business growth.</p>
+      <div style="margin-top: 12px;">
+        <a href="../assets/FoodWizz-Portable-Universal.zip" download class="download-btn" style="text-decoration:none;">
+          <button type="button">Download FoodWizz Portable (ZIP)</button>
+        </a>
+        <div style="margin-top:6px; font-size: 12px; color:#555;">
+          <span id="zipMeta">Fetching file info…</span>
+        </div>
+
+        <div class="setup-accordion" style="margin-top:20px;">
+          <h4 style="margin: 20px 0 8px 0;">Setup Guide</h4>
+          <details style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;margin-bottom:8px;">
+            <summary style="cursor:pointer;font-weight:600;">System Requirements</summary>
+            <ul style="margin-top:8px;padding-left:18px;">
+              <li>Windows 7/8/10/11 (32-bit or 64-bit)</li>
+              <li>Python 3.7 or higher installed (Add Python to PATH)</li>
+              <li>Internet connection (first run only)</li>
+              <li>At least 100 MB of free disk space</li>
+            </ul>
+          </details>
+          <details style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;">
+            <summary style="cursor:pointer;font-weight:600;">Installation Instructions</summary>
+            <ol style="margin-top:8px;padding-left:18px;">
+              <li>Download the ZIP file and extract it to any folder.</li>
+              <li>Open the extracted folder.</li>
+              <li>Recommended: Double‑click <strong>start_foodwizz_universal.bat</strong>.
+                <ul style="margin-top:6px;padding-left:18px;">
+                  <li>Automatically detects Python and creates a virtual environment.</li>
+                  <li>Installs all dependencies.</li>
+                  <li>Starts the app and opens your browser at http://localhost:5000.</li>
+                </ul>
+              </li>
+              <li>To stop the app: Double‑click <strong>stop_foodwizz_universal.bat</strong>.</li>
+            </ol>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="group">
+        <label for="periodSelect">Period:</label>
+        <select id="periodSelect">
+          <option value="today" selected>Today</option>
+          <option value="month">This month</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Sales (USD)</div>
+        <div class="kpi-value" id="kpiSalesToday">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Tickets</div>
+        <div class="kpi-value" id="kpiTicketsToday">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Inventory Value (USD)</div>
+        <div class="kpi-value" id="kpiInventoryValue">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Low Stock Items</div>
+        <div class="kpi-value" id="kpiLowStock">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Ingredients</div>
+        <div class="kpi-value" id="kpiIngredients">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Suppliers</div>
+        <div class="kpi-value" id="kpiSuppliers">—</div>
+      </div>
+    </div>
+          <td colspan="5" class="empty-state">Loading inventory data...</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px;">⚠️ Low Stock</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Qty</th>
+          <th>Min</th>
+          <th>Cost (USD)</th>
+          <th>Expiration</th>
+        </tr>
+      </thead>
+      <tbody id="lowStockTableBody">
+        <tr>
+          <td colspan="5" class="empty-state">Loading low stock...</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px;">🧾 Recent Orders</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Total (USD)</th>
+          <th>Status</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody id="recentOrdersBody">
+        <tr>
+          <td colspan="4" class="empty-state">Loading recent orders...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

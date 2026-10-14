@@ -1,0 +1,83 @@
+/* ===================== RESET BÁSICO ===================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fafafa;
+  padding: 20px;
+}
+
+/* ===================== CONTENEDOR PRINCIPAL ===================== */
+section {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ===================== TITULOS ===================== */
+h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  border-left: 5px solid #ff5e00;
+  padding-left: 10px;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+/* ===================== TEXTO ===================== */
+p {
+  margin-bottom: 15px;
+  text-align: justify;
+}
+
+/* ===================== LISTAS ===================== */
+ul {
+  margin: 10px 0 20px 25px;
+  list-style: disc;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+strong {
+  color: #ff5e00;
+}
+
+/* ===================== ENLACES ===================== */
+a {
+  color: #2980b9;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #1abc9c;
+  text-decoration: underline;
+}
+
+/* ===================== HEADER PLACEHOLDER ===================== */
+#header-placeholder {
+  margin-bottom: 30px;
+}

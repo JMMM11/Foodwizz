@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<!-- 
+    Foodwizz - Professional Restaurant Management System
+    Main application interface for managing restaurant inventory, dishes, and operations
+    
+    This file contains:
+    - Complete restaurant management dashboard
+    - Inventory management system
+    - Menu/dishes management
+    - Business analytics and reports
+    - System alerts and notifications
+    - User settings and preferences
+    - Modal forms for adding/editing items
+-->
+
+<html lang="en">
+<head>
+    <!-- Meta tags for proper HTML5 document setup -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Page title for browser tab -->
+    <title>Foodwizz - Professional Restaurant Management System</title>
+    
+    <!-- External Chart.js library for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS files for styling -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/dashboard-inventory.css">
+    
+    <!-- Favicon for browser tab -->
+    <link rel="icon" type="image/png" href="/static/images/isotipo.jpg">
+</head>
+<body>
+    <!-- Main application header with logo, branding, and user info -->
+    <header class="main-header">
+        <!-- Left side: Logo and company branding -->
+        <div class="header-left">
+            <!-- Logo container with status indicator -->
+            <div class="logo-wrapper">
+                <img src="/static/images/isotipo.jpg" alt="Foodwizz Logo" class="logo">
+                <!-- Green status dot indicating system is online -->
+                <span class="logo-status-dot"></span>
+            </div>
+            <!-- Company name and description -->
+            <div>
+                <div>Foodwizz</div>
+                <div>Professional Restaurant Management System</div>
+            </div>
+        </div>
+        
+        <!-- Right side: System status and user information -->
+        <div class="header-right">
+            <!-- Online status indicator -->
+            <span class="status-online"><span></span>System Online</span>
+            <!-- User account information -->
+            <div class="user-info">
+                <b id="user-name">Restaurant Manager</b>
+                <div id="last-access">Last access: Today</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main navigation menu for switching between application sections -->
+    <nav class="main-nav">
+        <!-- Dashboard tab - shows inventory overview and quick actions -->
+        <button class="active" onclick="showContent(0)">Dashboard</button>
+        <!-- Dishes tab - shows menu items and recipe management -->
+        <button onclick="showContent(1)">Dishes</button>
+        <!-- Reports tab - shows business analytics and charts -->
+        <button onclick="showContent(2)">Reports</button>
+        <!-- Alerts tab - shows system notifications and warnings -->
+        <button onclick="showContent(3)">Alerts</button>
+        <!-- Settings tab - shows user preferences and system configuration -->
+        <button onclick="showContent(4)">Settings</button>
+    </nav>
+
+    <!-- Main content area where different sections are dynamically loaded -->
+    <div id="content">
+        <!-- Dynamic content will be loaded here based on selected navigation tab -->
+    </div>
+
+    <!-- Shopping Cart -->
+    <div class="shopping-cart" id="shopping-cart">
+        <div class="cart-header">
+            <h3 id="cart-title">Shopping Cart</h3>
+            <button class="cart-close" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-total">
+            <div class="cart-total-row">
+                <span>Subtotal:</span>
+                <span id="cart-subtotal">$0.00</span>
+            </div>
+            <div class="cart-total-row">
+                <span>Tax (7%):</span>
+                <span id="cart-tax">$0.00</span>
+            </div>
+            <div class="cart-total-row final">
+                <span>Total:</span>
+                <span id="cart-total-amount">$0.00</span>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <button class="btn-outline" onclick="clearCart()">Clear Cart</button>
+            <button class="btn-primary" onclick="finalizeOrder()">Finalize Order</button>
+        </div>
+    </div>
+
+    <!-- Cart Toggle Button -->
+    <button class="cart-toggle" onclick="toggleCart()">
+        <img src="../static/images/Carrito_Icon.png" alt="Carrito" class="cart-icon">
+        <span class="cart-badge" id="cart-badge">0</span>
+    </button>
+
+    <!-- Main JavaScript application logic -->
+    <script>
+        // Global application state variables
+        let currentTab = 0;           // Currently active navigation tab (0=Dashboard, 1=Dishes, etc.)
+        let ingredients = [];         // Array to store all ingredient data
+        let dishes = [];              // Array to store all dish/menu data
+        let distributors = [];        // Array to store supplier/distributor information
+        let chartsInitialized = false; // Flag to prevent duplicate chart initialization
+        
+        // Shopping cart state
+        let cart = [];
+        
+
+
+        // Application initialization - runs when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserInfo();           // Load and display user information
+            showContent(0);           // Show dashboard by default
+            
+            // Initialize cart display
+            updateCart();
+        });
+
+
+
+        /**
+         * Toggles the shopping cart visibility
+         */
+        function toggleCart() {
+            const cart = document.getElementById('shopping-cart');
+            cart.style.display = cart.style.display === 'none' ? 'block' : 'none';
+        }
+
+        /**
+         * Adds a dish to the shopping cart
+         * @param {Object} dish - Dish object to add
+         */
+        function addToCart(dish) {
+            const existingItem = cart.find(item => item.id === dish.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: dish.id,
+                    name: dish.name,
+                    price: parseFloat(dish.sale_price) || 0,
+                    quantity: 1,
+                    image: dish.image_url
+                });
+            }
+            
+            updateCart();
+            showNotification(`${dish.name} added to cart`, 'success');
+        }
+
+        /**
+         * Updates the shopping cart display and totals
+         */
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartBadge = document.getElementById('cart-badge');
+            const cartSubtotal = document.getElementById('cart-subtotal');
+            const cartTax = document.getElementById('cart-tax');
+            const cartTotal = document.getElementById('cart-total-amount');
+            
+            // Update cart items
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : item.name.charAt(0)}
+                    </div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">$${parseFloat(item.price).toFixed(2)}</div>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Calculate totals dynamically
+            const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+            const tax = subtotal * 0.07;
+            const total = subtotal + tax;
+            
+            // Update cart badge with exact item count
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = totalItems;
+            
+            // Update totals display
+            cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            cartTax.textContent = `$${tax.toFixed(2)}`;
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        /**
+         * Updates the quantity of an item in the cart
+         * @param {number} id - Item ID
+         * @param {number} change - Quantity change (+1 or -1)
+         */
+        function updateQuantity(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(item => item.id !== id);
+                }
+                updateCart();
+            }
+        }
+
+        /**
+         * Clears all items from the shopping cart
+         */
+        function clearCart() {
+            cart = [];
+            updateCart();
+            showNotification('Cart cleared', 'success');
+        }
+
+        /**
+         * Finalizes the order and clears the cart
+         */
+        function finalizeOrder() {
+            if (cart.length === 0) {
+                showNotification('Cart is empty', 'warning');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+            const tax = total * 0.07;
+            const finalTotal = total + tax;
+            
+            showNotification(`Order finalized! Total: $${finalTotal.toFixed(2)}`, 'success');
+            cart = [];
+            updateCart();
+            toggleCart();
+        }
+
+        /**
+         * Previews the selected image file
+         * @param {HTMLInputElement} input - File input element
+         */
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const file = input.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        /**
+         * Loads and displays user information in the header
+         * Sets the username and last access time
+         */
+        function loadUserInfo() {
+            document.getElementById('user-name').textContent = 'Restaurant Manager';
+            document.getElementById('last-access').textContent = 'Last access: ' + new Date().toLocaleDateString();
+        }
+
+        /**
+         * Switches between different application sections based on navigation tab
+         * Updates the active tab styling and loads appropriate content
+         * @param {number} tabIndex - Index of the tab to show (0-4)
+         */
+        function showContent(tabIndex) {
+            currentTab = tabIndex; // Update current tab tracking
+            
+            // Update navigation button active states
+            document.querySelectorAll('.main-nav button').forEach((btn, index) => {
+                btn.classList.toggle('active', index === tabIndex);
+            });
+            
+            // Load appropriate content based on selected tab
+            switch(tabIndex) {
+                case 0: renderDashboard(); break;  // Dashboard with inventory overview
+                case 1: renderDishes(); break;    // Menu items and recipes
+                case 2: renderReports(); break;   // Business analytics and charts
+                case 3: renderAlerts(); break;    // System notifications
+                case 4: renderSettings(); break;  // User preferences
+            }
+        }
+
+        /**
+         * Renders the main dashboard view with inventory overview and business metrics
+         * Fetches data from the API and displays:
+         * - Statistics cards (ingredients, dishes, low stock, out of stock)
+         * - Quick action buttons
+         * - Featured products grid
+         * - Low stock alerts
+         * - Top selling dishes
+         * - Inventory value summary
+         */
+        async function renderDashboard() {
+            try {
+                // Fetch dashboard data from the API
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                
+                document.getElementById('content').innerHTML = `
+                    <div class="dashboard-grid">
+                        <div class="stat-card" onclick="showIngredientsList()">
+                            <div class="stat-icon total-ingredients"></div>
+                            <div class="stat-content">
+                                <h3>${data.total_ingredients}</h3>
+                                <p>Total Ingredients</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon menu-items"></div>
+                            <div class="stat-content">
+                                <h3>${data.total_dishes}</h3>
+                                <p>Menu Items</p>
+                            </div>
+                        </div>
+                        <div class="stat-card ${data.low_stock_count > 0 ? 'warning' : ''}" onclick="showLowStockItems()">
+                            <div class="stat-icon low-stock"></div>
+                            <div class="stat-content">
+                                <h3>${data.low_stock_count}</h3>
+                                <p>Low Stock Items</p>
+                            </div>
+                        </div>
+                        <div class="stat-card ${data.out_of_stock_count > 0 ? 'danger' : ''}" onclick="showOutOfStockItems()">
+                            <div class="stat-icon out-of-stock"></div>
+                            <div class="stat-content">
+                                <h3>${data.out_of_stock_count}</h3>
+                                <p>Out of Stock</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search bar for filtering dashboard content -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" id="dashboard-search" placeholder="Search ingredients, dishes, or suppliers..." onkeyup="filterDashboardContent(this.value)">
+                            <button type="button" class="search-btn">
+                                <img src="/static/images/Lupa.png" alt="Search" width="25" height="25">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>Quick Actions</h2>
+                    </div>
+                    
+                    <div class="dashboard-actions">
+                        <button onclick="showAddIngredientModal()" class="btn-primary">Add Ingredient</button>
+                        <button onclick="showEditIngredientSelector()" class="btn-secondary">Edit Ingredient</button>
+                        <button onclick="exportData()" class="btn-orange">Export Data</button>
+                        <button onclick="showDistributors()" class="btn-accent">View Distributors</button>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Featured Products</h2>
+                    </div>
+                    
+                    <div class="dashboard-layout">
+                    <!-- Columna izquierda -->
+                    <div class="left-column">
+                        <div class="chart-card">
+                            <h3>Inventory Overview</h3>
+                            <div class="inventory-grid" id="dashboard-inventory">
+                                ${await renderDashboardInventory()}
+                            </div>
+                        </div>
+
+                        ${data.low_stock_items.length > 0 ? `
+                        <div class="chart-card">
+                            <h3>Low Stock Alerts</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                ${data.low_stock_items.map(item => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--background-color); border-radius: var(--border-radius-small); border: 1px solid var(--border-color);">
+                                        <span>${item.name}</span>
+                                        <span style="font-weight: 600; color: var(--warning-color);">${item.stock} ${item.unit}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Columna derecha -->
+                    <div class="right-column">
+                        <div class="chart-card">
+                            <h3>Inventory Value</h3>
+                            <div style="text-align: center; padding: 2rem;">
+                                <div style="font-size: clamp(2rem, 6vw, 2.5rem); font-weight: bold; color: var(--success-color);">
+                                    $${data.inventory_value.toFixed(2)}
+                                </div>
+                                <p style="color: var(--text-secondary); margin-top: 0.5rem;">Total Inventory Value</p>
+                            </div>
+                        </div>
+
+                        ${data.top_dishes.length > 0 ? `
+                        <div class="chart-card">
+                            <h3>Top Selling Dishes</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                ${data.top_dishes.map((dish, index) => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--background-color); border-radius: var(--border-radius-small); border: 1px solid var(--border-color);">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <span style="width: 1.5rem; height: 1.5rem; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${index + 1}</span>
+                                            <div>
+                                                <div style="font-weight: 600;">${dish.name}</div>
+                                                <div style="font-size: 0.75rem; color: var(--text-secondary);">$${dish.sale_price.toFixed(2)}</div>
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: 600; color: var(--primary-color);">${dish.total_sold || 0} sold</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-secondary);">${dish.orders_count || 0} orders</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                `;
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showNotification('Error loading dashboard', 'error');
+            }
+        }
+
+        async function renderDashboardInventory() {
+            try {
+                const response = await fetch('/api/ingredients');
+                const ingredients = await response.json();
+                
+                return ingredients.slice(0, 8).map(ingredient => `
+                    <div class ="inventory-info-card">
+                        <h4>${ingredient.name}</h4>
+                        <div class="inventory-card ${ingredient.stock <= ingredient.min_stock ? 'low-stock' : ''} ${ingredient.stock === 0 ? 'out-of-stock' : ''}">
+                            <div class="inventory-image">
+                                <img src="${ingredient.image_url}" alt="${ingredient.name}" onerror="this.style.display='none'">
+                            </div>
+                            <div class="inventory-info">
+                                <div class="supplier-badge">${ingredient.supplier}</div>
+                                <div class="inventory-stats">
+                                    <span>Stock: ${ingredient.stock} ${ingredient.unit}</span>
+                                    <span>Cost: $${ingredient.cost.toFixed(2)} per ${ingredient.unit}</span>
+                                    <span>Category: ${ingredient.category}</span>
+                                    <span class="text-${ingredient.stock === 0 ? 'error' : ingredient.stock <= ingredient.min_stock ? 'warning' : 'success'}">
+                                        ${ingredient.stock === 0 ? 'Out of Stock' : ingredient.stock <= ingredient.min_stock ? 'Low Stock' : 'In Stock'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                return '<p>Error loading inventory preview</p>';
+            }
+        }
+
+        async function showIngredientsList() {
+            try {
+                const response = await fetch('/api/ingredients');
+                ingredients = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal" style="max-width: 60rem;">
+                        <div class="form-header">
+                            <h3>Complete Ingredients Inventory (${ingredients.length} items)</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            <!-- Search bar for inventory -->
+                            <div class="search-container" style="margin-bottom: 1.5rem;">
+                                <div class="search-box">
+                                    <input type="text" id="inventory-search" placeholder="Search ingredients..." onkeyup="filterInventoryContent(this.value)">
+                                    <button type="button" class="search-btn">
+                                        <img src="static/images/lupa.png" alt="Search" width="25" height="25" style="margin-right: 2px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="inventory-grid">
+                                ${ingredients.map(ingredient => `
+                                    <div class="inventory-card ${ingredient.stock <= ingredient.min_stock ? 'low-stock' : ''} ${ingredient.stock === 0 ? 'out-of-stock' : ''}">
+                                        <div class="inventory-image">
+                                            <img src="${ingredient.image_url}" alt="${ingredient.name}" onerror="this.style.display='none'">
+                                        </div>
+                                        <div class="inventory-info">
+                                            <h4>${ingredient.name}</h4>
+                                            <div class="category-badge">${ingredient.category}</div>
+                                            <div class="supplier-badge">${ingredient.supplier}</div>
+                                            <div class="inventory-stats">
+                                                <span>Stock: ${ingredient.stock} ${ingredient.unit}</span>
+                                                <span>Cost: $${ingredient.cost.toFixed(2)} per ${ingredient.unit}</span>
+                                                <span>Min Stock: ${ingredient.min_stock} ${ingredient.unit}</span>
+                                                <span>Total Value: $${(ingredient.stock * ingredient.cost).toFixed(2)}</span>
+                                                <span class="text-${ingredient.stock === 0 ? 'error' : ingredient.stock <= ingredient.min_stock ? 'warning' : 'success'}">
+                                                    ${ingredient.stock === 0 ? 'Out of Stock' : ingredient.stock <= ingredient.min_stock ? 'Low Stock' : 'In Stock'}
+                                                </span>
+                                            </div>
+                                            <div class="inventory-actions">
+                                                <button onclick="editIngredient(${ingredient.id})" class="btn-secondary">Edit</button>
+                                                <button onclick="deleteIngredient(${ingredient.id})" class="danger">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Error loading ingredients', 'error');
+            }
+        }
+
+        async function showLowStockItems() {
+            try {
+                const response = await fetch('/api/ingredients/low-stock');
+                const lowStockItems = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal" style="max-width: 50rem;">
+                        <div class="form-header">
+                            <h3>Low Stock Items (${lowStockItems.length} items)</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            ${lowStockItems.length > 0 ? `
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    ${lowStockItems.map(item => `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--warning-color); border-left: 4px solid var(--warning-color);">
+                                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                                <div style="width: 50px; height: 50px; background: var(--background-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; background-image: url('images/low_stock.png'); background-size: 60%; background-repeat: no-repeat; background-position: center;"></div>
+                                                <div>
+                                                    <div style="font-weight: 600; color: var(--text-primary);">${item.name}</div>
+                                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Category: ${item.category}</div>
+                                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Supplier: ${item.supplier}</div>
+                                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Min Stock: ${item.min_stock} ${item.unit}</div>
+                                                </div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-weight: 600; color: var(--warning-color); font-size: 1.125rem;">${item.stock} ${item.unit}</div>
+                                                <div style="font-size: 0.75rem; color: var(--text-secondary);">Current Stock</div>
+                                                <button onclick="editIngredient(${item.id})" class="btn-primary" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.75rem;">Restock</button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<div class="no-data-placeholder"><img src="images/low_stock.png" alt="No low stock"><p>No low stock items found!</p></div>'}
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Error loading low stock items', 'error');
+            }
+        }
+
+        async function showOutOfStockItems() {
+            try {
+                const response = await fetch('/api/ingredients/out-of-stock');
+                const outOfStockItems = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal" style="max-width: 50rem;">
+                        <div class="form-header">
+                            <h3>Out of Stock Items (${outOfStockItems.length} items)</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            ${outOfStockItems.length > 0 ? `
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    ${outOfStockItems.map(item => `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--error-color); border-left: 4px solid var(--error-color);">
+                                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                                <div style="width: 50px; height: 50px; background: var(--background-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; background-image: url('images/out_of_stock.png'); background-size: 60%; background-repeat: no-repeat; background-position: center; opacity: 0.5;"></div>
+                                                <div>
+                                                    <div style="font-weight: 600; color: var(--text-primary);">${item.name}</div>
+                                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Category: ${item.category}</div>
+                                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Supplier: ${item.supplier}</div>
+                                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Cost: $${item.cost.toFixed(2)} per ${item.unit}</div>
+                                                </div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-weight: 600; color: var(--error-color); font-size: 1.125rem;">0 ${item.unit}</div>
+                                                <div style="font-size: 0.75rem; color: var(--text-secondary);">Out of Stock</div>
+                                                <button onclick="editIngredient(${item.id})" class="btn-primary" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.75rem;">Restock Now</button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<div class="no-data-placeholder"><img src="images/out_of_stock.png" alt="No out of stock"><p>No out of stock items found!</p></div>'}
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Error loading out of stock items', 'error');
+            }
+        }
+
+        async function showDistributors() {
+            try {
+                const response = await fetch('/api/distributors');
+                distributors = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal" style="max-width: 60rem;">
+                        <div class="form-header">
+                            <h3>Distributors & Suppliers</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(25rem, 100%), 1fr)); gap: 1.5rem;">
+                                ${distributors.map(distributor => `
+                                    <div class="distributor-card">
+                                        <div class="distributor-header">
+                                            <div>
+                                                <div class="distributor-name">${distributor.name}</div>
+                                                <div class="distributor-specialty">${distributor.specialty}</div>
+                                            </div>
+                                            <div class="distributor-rating">
+                                                ${distributor.rating.toFixed(1)} Stars
+                                            </div>
+                                        </div>
+                                        <div class="distributor-contact">
+                                            <span><strong>Contact:</strong> ${distributor.contact_person}</span>
+                                            <span><strong>Phone:</strong> ${distributor.phone}</span>
+                                            <span><strong>Email:</strong> ${distributor.email}</span>
+                                            <span><strong>Website:</strong> <a href="https://${distributor.website}" target="_blank" style="color: var(--primary-color);">${distributor.website}</a></span>
+                                        </div>
+                                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                            <button class="btn-primary" onclick="showNotification('Contact feature coming soon!', 'warning')" style="flex: 1;">Contact</button>
+                                            <button class="btn-secondary" onclick="showNotification('Order feature coming soon!', 'warning')" style="flex: 1;">Order</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Error loading distributors', 'error');
+            }
+        }
+
+        /**
+         * Renders the dishes/menu management section
+         * Displays all menu items with:
+         * - Dish information (name, description, price, category)
+         * - Recipe ingredients and quantities
+         * - Cost analysis (cost, profit, margin)
+         * - Action buttons (prepare, edit, delete)
+         */
+        async function renderDishes() {
+            try {
+                // Fetch all dishes from the API
+                const response = await fetch('/api/dishes');
+                dishes = await response.json();
+                
+                document.getElementById('content').innerHTML = `
+                    <div class="section-header">
+                        <h2>Restaurant Menu (${dishes.length} dishes)</h2>
+                        <button onclick="showAddDishModal()" class="btn-primary">Add New Dish</button>
+                    </div>
+                    
+                    <!-- Search bar for filtering dishes -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" id="dishes-search" placeholder="Search dishes by name, category, or ingredients..." onkeyup="filterDishesContent(this.value)">
+                            <button type="button" class="search-btn">
+                                <img src="static/images/lupa.png" alt="Search" width="25" height="25">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dishes-grid">
+                        ${dishes.map(dish => {
+                            const cost = dish.recipe.reduce((acc, r) => acc + (r.cost * r.quantity), 0);
+                            const profit = dish.sale_price - cost;
+                            const margin = dish.sale_price ? ((profit / dish.sale_price) * 100) : 0;
+                            
+                            return `
+                                <div class="dish-card">
+                                    <div class="dish-image">
+                                        <img src="${dish.image_url}" alt="${dish.name}" onerror="this.style.display='none'">
+                                    </div>
+                                    <div class="dish-info">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                            <div class="category-badge">${dish.category}</div>
+                                            <div class="prep-time">${dish.prep_time}min</div>
+                                        </div>
+                                        <h4>${dish.name}</h4>
+                                        ${dish.description ? `<p class="dish-description">${dish.description}</p>` : ''}
+                                        <div class="dish-price">$${dish.sale_price.toFixed(2)}</div>
+                                        <div class="dish-ingredients">
+                                            <strong>Ingredients:</strong><br>
+                                            ${dish.recipe.map(r => 
+                                                `• ${r.ingredient_name} (${r.quantity} ${r.unit})`
+                                            ).join('<br>') || 'No ingredients specified'}
+                                        </div>
+                                        <div style="margin: 1rem 0; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; font-size: 0.875rem;">
+                                                <div><strong>Cost:</strong> $${cost.toFixed(2)}</div>
+                                                <div><strong>Profit:</strong> <span class="text-success">$${profit.toFixed(2)}</span></div>
+                                                <div><strong>Margin:</strong> <span class="text-primary">${margin.toFixed(1)}%</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="dish-actions">
+                                            <button onclick="prepareDish(${dish.id})" class="btn-primary">Prepare</button>
+                                            <button onclick="editDish(${dish.id})" class="btn-secondary">Edit</button>
+                                            <button onclick="deleteDish(${dish.id})" class="danger">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading dishes:', error);
+                showNotification('Error loading dishes', 'error');
+            }
+        }
+
+        /**
+         * Renders the business reports and analytics section
+         * Creates interactive charts and displays:
+         * - Sales performance over time
+         * - Top selling dishes ranking
+         * - Profit analysis and margins
+         * - Inventory trends
+         * - Category distribution
+         * - Monthly revenue tracking
+         */
+        function renderReports() {
+            document.getElementById('content').innerHTML = `
+                <div class="section-header">
+                    <h2>Business Reports & Analytics</h2>
+                    <button onclick="exportReport()" class="btn-primary">Export Report</button>
+                </div>
+                
+                <div class="dashboard-charts">
+                    <div class="chart-card" onclick="toggleChartExpansion(this, 'sales')">
+                        <div class="chart-header">
+                            <h3>Sales Performance</h3>
+                            <p>Track daily, weekly, and monthly sales trends to optimize business performance</p>
+                            <button class="chart-expand-icon">+</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">Total Sales</span>
+                                <span style="display: block; font-size: 1.125rem; font-weight: 700; color: var(--text-primary);">$12,450</span>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">Orders</span>
+                                <span style="display: block; font-size: 1.125rem; font-weight: 700; color: var(--text-primary);">156</span>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">Avg. Order</span>
+                                <span style="display: block; font-size: 1.125rem; font-weight: 700; color: var(--text-primary);">$79.81</span>
+                            </div>
+                        </div>
+                        <div class="expanded-charts" id="sales-expanded">
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Daily</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="salesDailyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Weekly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="salesWeeklyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Monthly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="salesMonthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card" onclick="toggleChartExpansion(this, 'dishes')">
+                        <div class="chart-header">
+                            <h3>Top Selling Dishes</h3>
+                            <p>Analyze dish popularity and performance across different time periods</p>
+                            <button class="chart-expand-icon">+</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="dishesChart"></canvas>
+                        </div>
+                        <div class="expanded-charts" id="dishes-expanded">
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Daily</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="dishesDailyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Weekly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="dishesWeeklyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Monthly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="dishesMonthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card" onclick="toggleChartExpansion(this, 'profit')">
+                        <div class="chart-header">
+                            <h3>Profit Analysis</h3>
+                            <p>Monitor profit margins and cost analysis for better financial planning</p>
+                            <button class="chart-expand-icon">+</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="profitChart"></canvas>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+                            <div style="text-align: center; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">Cost of Goods</span>
+                                <span style="display: block; font-size: 1.125rem; font-weight: 700; color: var(--orange-color);">$4,205</span>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">Gross Profit</span>
+                                <span style="display: block; font-size: 1.125rem; font-weight: 700; color: var(--success-color);">$8,245</span>
+                            </div>
+                            <div style="text-align: center; padding: 0.75rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">Profit Margin</span>
+                                <span style="display: block; font-size: 1.125rem; font-weight: 700; color: var(--success-color);">66.2%</span>
+                            </div>
+                        </div>
+                        <div class="expanded-charts" id="profit-expanded">
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Daily</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="profitDailyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Weekly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="profitWeeklyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Monthly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="profitMonthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card" onclick="toggleChartExpansion(this, 'revenue')">
+                        <div class="chart-header">
+                            <h3>Monthly Revenue</h3>
+                            <p>Track revenue growth and seasonal patterns for strategic planning</p>
+                            <button class="chart-expand-icon">+</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                        <div class="expanded-charts" id="revenue-expanded">
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Daily</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="revenueDailyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Weekly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="revenueWeeklyChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="expanded-chart">
+                                <h4 class="chart-tab">Monthly</h4>
+                                <div class="expanded-chart-container">
+                                    <canvas id="revenueMonthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Create charts after DOM is ready with proper error handling
+            setTimeout(() => {
+                try {
+                    createSalesChart();
+                    createDishesChart();
+                    createProfitChart();
+                    createRevenueChart();
+                    chartsInitialized = true;
+                } catch (error) {
+                    console.error('Error creating charts:', error);
+                    showNotification('Error loading charts', 'warning');
+                }
+            }, 100);
+        }
+
+        /**
+         * Creates a line chart showing daily sales performance
+         * Displays sales data over a week with:
+         * - Smooth curved lines for better visualization
+         * - Gold color scheme matching the app's design
+         * - Responsive scaling and proper formatting
+         * - Error handling for missing canvas elements
+         */
+        function createSalesChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+
+            try {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Daily Sales',
+                            data: [1200, 1900, 1500, 2100, 1800, 2400, 2200],
+                            borderColor: '#DDAA00',
+                            backgroundColor: 'rgba(221, 170, 0, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                ctx.parentElement.innerHTML = '<div class="no-data-placeholder"><img src="images/report_chart.png" alt="No data"><p>No data available</p></div>';
+            }
+        }
+
+        /**
+         * Creates a bar chart showing top selling dishes performance
+         * Displays dish popularity with:
+         * - Color-coded bars for different dishes
+         * - Responsive design that adapts to container size
+         * - Clean layout without legend for better focus
+         * - Error handling for missing canvas elements
+         */
+        function createDishesChart() {
+            const ctx = document.getElementById('dishesChart');
+            if (!ctx) return;
+
+            try {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Classic Burger', 'Chicken Wrap', 'BBQ Ribs', 'Caesar Salad', 'Fish Tacos'],
+                        datasets: [{
+                            label: 'Orders',
+                            data: [45, 38, 32, 28, 25],
+                            backgroundColor: [
+                                '#DDAA00',
+                                '#85AAAA',
+                                '#606C38',
+                                '#FF7F0D',
+                                '#173F4E'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                ctx.parentElement.innerHTML = '<div class="no-data-placeholder"><img src="images/report_chart.png" alt="No data"><p>No data available</p></div>';
+            }
+        }
+
+        /**
+         * Creates a doughnut chart showing profit analysis
+         * Displays profit vs cost breakdown with:
+         * - Two-color scheme (olive green for profit, orange for costs)
+         * - Clean white borders for better separation
+         * - Bottom legend positioning for better layout
+         * - Error handling for missing canvas elements
+         */
+        function createProfitChart() {
+            const ctx = document.getElementById('profitChart');
+            if (!ctx) return;
+
+            try {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Profit', 'Cost of Goods'],
+                        datasets: [{
+                            data: [8245, 4205],
+                            backgroundColor: ['#606C38', '#FF7F0D'],
+                            borderWidth: 2,
+                            borderColor: '#FFFFFF'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                ctx.parentElement.innerHTML = '<div class="no-data-placeholder"><img src="images/report_chart.png" alt="No data"><p>No data available</p></div>';
+            }
+        }
+
+
+
+                function createRevenueChart() {
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            try {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [12000, 15000, 13500, 18000, 16500, 20000],
+                            backgroundColor: '#DDAA00',
+                            borderColor: '#173F4E',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                ctx.parentElement.innerHTML = '<div class="no-data-placeholder"><img src="images/report_chart.png" alt="No data"><p>No data available</p></div>';
+            }
+        }
+
+        /**
+         * Toggles chart expansion to show detailed daily, weekly, and monthly views
+         * @param {HTMLElement} chartCard - The chart card element to expand
+         * @param {string} chartType - Type of chart (sales, dishes, profit, revenue)
+         */
+        function toggleChartExpansion(chartCard, chartType) {
+            const expandedCharts = chartCard.querySelector('.expanded-charts');
+            const isExpanded = chartCard.classList.contains('expanded');
+            
+            // Collapse all other charts first
+            document.querySelectorAll('.chart-card').forEach(card => {
+                card.classList.remove('expanded');
+                card.querySelector('.expanded-charts').classList.remove('show');
+            });
+            
+            // Toggle current chart
+            if (!isExpanded) {
+                chartCard.classList.add('expanded');
+                expandedCharts.classList.add('show');
+                
+                // Create detailed charts if not already created
+                createDetailedCharts(chartType);
+            }
+        }
+
+        /**
+         * Creates detailed daily, weekly, and monthly charts for expanded view
+         * @param {string} chartType - Type of chart to create detailed views for
+         */
+        function createDetailedCharts(chartType) {
+            const chartData = {
+                sales: {
+                    daily: [1200, 1900, 1500, 2100, 1800, 2400, 2200],
+                    weekly: [8500, 9200, 8800, 9500],
+                    monthly: [12000, 15000, 13500, 18000, 16500, 20000]
+                },
+                dishes: {
+                    daily: [45, 38, 32, 28, 25, 42, 35],
+                    weekly: [180, 165, 175, 190],
+                    monthly: [1200, 1500, 1350, 1800, 1650, 2000]
+                },
+                profit: {
+                    daily: [800, 1200, 950, 1400, 1150, 1600, 1450],
+                    weekly: [6000, 6800, 6400, 7200],
+                    monthly: [8000, 10000, 9000, 12000, 11000, 13500]
+                },
+                revenue: {
+                    daily: [1200, 1900, 1500, 2100, 1800, 2400, 2200],
+                    weekly: [8500, 9200, 8800, 9500],
+                    monthly: [12000, 15000, 13500, 18000, 16500, 20000]
+                }
+            };
+
+            const data = chartData[chartType];
+            if (!data) return;
+
+            // Create charts based on type
+            if (chartType === 'sales') {
+                createDetailedLineChart(`${chartType}DailyChart`, data.daily, 'Daily', chartType);
+                createDetailedLineChart(`${chartType}WeeklyChart`, data.weekly, 'Weekly', chartType);
+                createDetailedLineChart(`${chartType}MonthlyChart`, data.monthly, 'Monthly', chartType);
+            } else if (chartType === 'dishes') {
+                createDetailedBarChart(`${chartType}DailyChart`, data.daily, 'Daily', chartType);
+                createDetailedBarChart(`${chartType}WeeklyChart`, data.weekly, 'Weekly', chartType);
+                createDetailedBarChart(`${chartType}MonthlyChart`, data.monthly, 'Monthly', chartType);
+            } else if (chartType === 'profit') {
+                createDetailedDonutChart(`${chartType}DailyChart`, data.daily, 'Daily', chartType);
+                createDetailedDonutChart(`${chartType}WeeklyChart`, data.weekly, 'Weekly', chartType);
+                createDetailedDonutChart(`${chartType}MonthlyChart`, data.monthly, 'Monthly', chartType);
+            } else if (chartType === 'revenue') {
+                createDetailedBarChart(`${chartType}DailyChart`, data.daily, 'Daily', chartType);
+                createDetailedBarChart(`${chartType}WeeklyChart`, data.weekly, 'Weekly', chartType);
+                createDetailedBarChart(`${chartType}MonthlyChart`, data.monthly, 'Monthly', chartType);
+            }
+        }
+
+        /**
+         * Creates a detailed line chart for expanded view
+         * @param {string} canvasId - ID of the canvas element
+         * @param {Array} data - Data array for the chart
+         * @param {string} period - Time period (Daily, Weekly, Monthly)
+         * @param {string} type - Chart type
+         */
+        function createDetailedLineChart(canvasId, data, period, type) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+
+            try {
+                const labels = period === 'Daily' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
+                              period === 'Weekly' ? ['Week 1', 'Week 2', 'Week 3', 'Week 4'] :
+                              ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: period,
+                            data: data,
+                            borderColor: '#DDAA00',
+                            backgroundColor: 'rgba(221, 170, 0, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error(`Error creating ${canvasId}:`, error);
+            }
+        }
+
+        /**
+         * Creates a detailed bar chart for expanded view
+         * @param {string} canvasId - ID of the canvas element
+         * @param {Array} data - Data array for the chart
+         * @param {string} period - Time period (Daily, Weekly, Monthly)
+         * @param {string} type - Chart type
+         */
+        function createDetailedBarChart(canvasId, data, period, type) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+
+            try {
+                const labels = period === 'Daily' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
+                              period === 'Weekly' ? ['Week 1', 'Week 2', 'Week 3', 'Week 4'] :
+                              ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+                const colors = type === 'dishes' ? '#85AAAA' : '#FF7F0D';
+                const bgColors = type === 'dishes' ? 'rgba(133, 170, 170, 0.8)' : 'rgba(255, 127, 13, 0.8)';
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: period,
+                            data: data,
+                            backgroundColor: bgColors,
+                            borderColor: colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return type === 'dishes' ? value : '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error(`Error creating ${canvasId}:`, error);
+            }
+        }
+
+        /**
+         * Creates a detailed donut chart for expanded view
+         * @param {string} canvasId - ID of the canvas element
+         * @param {Array} data - Data array for the chart
+         * @param {string} period - Time period (Daily, Weekly, Monthly)
+         * @param {string} type - Chart type
+         */
+        function createDetailedDonutChart(canvasId, data, period, type) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+
+            try {
+                const labels = period === 'Daily' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
+                              period === 'Weekly' ? ['Week 1', 'Week 2', 'Week 3', 'Week 4'] :
+                              ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+                // For donut charts, we'll show the data as segments
+                const chartData = data.map((value, index) => ({
+                    label: labels[index],
+                    value: value
+                }));
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.map(item => item.label),
+                        datasets: [{
+                            data: chartData.map(item => item.value),
+                            backgroundColor: [
+                                '#DDAA00', '#85AAAA', '#606C38', '#FF7F0D',
+                                '#173F4E', '#FEFAE0', '#DC2626'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#FFFFFF'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            } catch (error) {
+                console.error(`Error creating ${canvasId}:`, error);
+            }
+        }
+
+        /**
+         * Renders the system alerts and notifications section
+         * Displays various types of alerts:
+         * - Critical stock alerts (red border)
+         * - Low stock warnings (yellow border)
+         * - System updates (green border)
+         * - Daily reports (blue border)
+         * Each alert includes action buttons for user interaction
+         */
+        function renderAlerts() {
+            document.getElementById('content').innerHTML = `
+                <div class="section-header">
+                    <h2>System Alerts & Notifications</h2>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color); border-left: 4px solid var(--error-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <strong style="color: var(--error-color);">Critical Stock Alert</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">2 minutes ago</span>
+                        </div>
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Multiple ingredients are running critically low. Immediate reorder required for: Ground Beef, Cheese Slices, Burger Buns.</p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-outline" onclick="showNotification('Alert acknowledged', 'success')">Acknowledge</button>
+                            <button class="btn-primary" onclick="showLowStockItems()">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color); border-left: 4px solid var(--warning-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <strong style="color: var(--warning-color);">Low Stock Warning</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">15 minutes ago</span>
+                        </div>
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Several ingredients are below minimum threshold levels. Consider restocking soon.</p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-outline" onclick="showLowStockItems()">View Details</button>
+                            <button class="btn-primary" onclick="showDistributors()">Contact Suppliers</button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <strong style="color: var(--success-color);">Inventory Updated</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">1 hour ago</span>
+                        </div>
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">New stock delivery has been successfully added to inventory. 15 items restocked.</p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-outline" onclick="showIngredientsList()">View Inventory</button>
+                        </div>
+                        
+
+                    </div>
+
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color); border-left: 4px solid var(--primary-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <strong style="color: var(--primary-color);">Daily Report Ready</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">3 hours ago</span>
+                        </div>
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Your daily sales and inventory report is ready for review. Total sales: $2,450.</p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-outline" onclick="showContent(2)">View Reports</button>
+                            <button class="btn-primary" onclick="exportReport()">Export Report</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the system settings and user preferences section
+         * Provides configuration options for:
+         * - User account management (username, email, password)
+         * - Restaurant settings (name, preferences)
+         * - Data management (export, import, clear)
+         * - Notification preferences
+         * - Supplier and auto-reorder settings
+         */
+        function renderSettings() {
+            document.getElementById('content').innerHTML = `
+                <div class="section-header">
+                    <h2>System Settings</h2>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(18.75rem, 100%), 1fr)); gap: 1.5rem;">
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.125rem; font-weight: 600;">User Account</h3>
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary);">Username</label>
+                            <input type="text" value="restaurant_manager" readonly style="background: var(--background-color);">
+                        </div>
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary);">Email</label>
+                            <input type="email" value="manager@foodwizz.com">
+                        </div>
+                        <button class="btn-secondary" onclick="showNotification('Feature coming soon!', 'warning')">Change Password</button>
+                    </div>
+                    
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.125rem; font-weight: 600;">Restaurant Settings</h3>
+                        
+
+                        
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary);">Restaurant Name</label>
+                            <input type="text" value="Foodwizz Food Truck">
+                        </div>
+                        <button class="btn-primary" onclick="showNotification('Settings saved successfully!', 'success')">Save Settings</button>
+                    </div>
+                    
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.125rem; font-weight: 600;">Data Management</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <button onclick="exportData()" class="btn-primary">Export Data</button>
+                            <button onclick="loadSampleData()" class="btn-secondary">Load Sample Data</button>
+                            <button onclick="clearAllData()" class="danger">Clear All Data</button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.125rem; font-weight: 600;">Notifications</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" checked> Email alerts for low stock
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" checked> Daily inventory reports
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> SMS notifications
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" checked> Order confirmations
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.125rem; font-weight: 600;">Supplier Preferences</h3>
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary);">Primary Supplier</label>
+                            <select>
+                                <option value="sysco">Sysco Food Service Market</option>
+                                <option value="pricesmart">PriceSmart</option>
+                                <option value="nestle">Nestle Professional</option>
+                                <option value="unilever">Unilever Food Solutions</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary);">Auto-reorder threshold</label>
+                            <select>
+                                <option value="low">When stock is low</option>
+                                <option value="critical">When stock is critical</option>
+                                <option value="out">When out of stock</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <button class="btn-accent" onclick="showDistributors()">Manage Suppliers</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Modal Functions for User Interface
+        /**
+         * Shows the modal form for adding new ingredients to inventory
+         * Creates a form with fields for:
+         * - Ingredient name and description
+         * - Stock quantity and unit of measure
+         * - Cost per unit and category
+         * - Minimum stock level and supplier
+         * - Optional image upload
+         */
+        function showAddIngredientModal() {
+            const modal = document.createElement('div');
+            modal.className = 'form-overlay';
+            modal.innerHTML = `
+                <div class="form-modal">
+                    <div class="form-header">
+                        <h3>Add New Ingredient</h3>
+                        <button class="btn-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="form-content">
+                        <form onsubmit="submitIngredientForm(event)">
+                            <div class="form-group">
+                                <label>Ingredient Name</label>
+                                <input type="text" name="name" placeholder="e.g., Ground Beef" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Current Stock</label>
+                                    <input type="number" name="stock" min="0" step="0.01" placeholder="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit of Measure</label>
+                                    <select name="unit" required>
+                                        <option value="">Select Unit</option>
+                                        <option value="kg">Kilograms (kg)</option>
+                                        <option value="g">Grams (g)</option>
+                                        <option value="l">Liters (l)</option>
+                                        <option value="ml">Milliliters (ml)</option>
+                                        <option value="pack">Packs</option>
+                                        <option value="piece">Pieces</option>
+                                        <option value="bottles">Bottles</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Cost per Unit ($)</label>
+                                    <input type="number" name="cost" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Meat">Meat</option>
+                                        <option value="Vegetables">Vegetables</option>
+                                        <option value="Dairy">Dairy</option>
+                                        <option value="Bread">Bread</option>
+                                        <option value="Condiments">Condiments</option>
+                                        <option value="Beverages">Beverages</option>
+                                        <option value="Sides">Sides</option>
+                                        <option value="Spices">Spices</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Minimum Stock Level</label>
+                                    <input type="number" name="min_stock" step="0.01" min="0" placeholder="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Supplier</label>
+                                    <select name="supplier" required>
+                                        <option value="">Select Supplier</option>
+                                        <option value="Sysco Food Service">Sysco Food Service Market</option>
+                                        <option value="PriceSmart">PriceSmart</option>
+                                        <option value="Nestle">Nestle Professional</option>
+                                        <option value="Unilever Food Solutions">Unilever Food Solutions</option>
+                                        <option value="Panama Gourmet Foods">Panama Gourmet Foods</option>
+                                        <option value="Prolacsa">Prolacsa</option>
+                                        <option value="Local Supplier">Local Supplier</option>
+                                        <option value="Local Farm">Local Farm</option>
+                                        <option value="Local Bakery">Local Bakery</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Image File (optional)</label>
+                                <div class="file-upload-container">
+                                    <input type="file" name="image_file" accept="image/*" class="file-upload-input" onchange="previewImage(this)">
+                                    <label class="file-upload-label">
+                                        <div class="file-upload-icon">📷</div>
+                                        <div class="file-upload-text">Click to upload image</div>
+                                        <div class="file-upload-hint">JPG, PNG, GIF up to 5MB</div>
+                                    </label>
+                                </div>
+                                <div class="file-upload-preview" id="image-preview"></div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" onclick="closeModal()" class="btn-outline">Cancel</button>
+                                <button type="submit" class="btn-primary">Add Ingredient</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function showEditIngredientSelector() {
+            try {
+                const response = await fetch('/api/ingredients');
+                const ingredients = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal">
+                        <div class="form-header">
+                            <h3>Select Ingredient to Edit</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 25rem; overflow-y: auto;">
+                                ${ingredients.map(ingredient => `
+                                    <div onclick="editIngredient(${ingredient.id})" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--background-color); border-radius: var(--border-radius); border: 1px solid var(--border-color); cursor: pointer; transition: var(--transition);" onmouseover="this.style.background='var(--border-color)'" onmouseout="this.style.background='var(--background-color)'">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <div style="width: 40px; height: 40px; background: var(--background-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; background-image: url('${ingredient.image_url || "static/images/dish_placeholder.png"}'); background-size: 60%; background-repeat: no-repeat; background-position: center;"></div>
+                                            <div>
+                                                <div style="font-weight: 600; color: var(--text-primary);">${ingredient.name}</div>
+                                                <div style="font-size: 0.875rem; color: var(--text-secondary);">${ingredient.category} - ${ingredient.stock} ${ingredient.unit} - ${ingredient.supplier}</div>
+                                            </div>
+                                        </div>
+                                        <div style="color: var(--primary-color); font-weight: 600;">Edit →</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Error loading ingredients', 'error');
+            }
+        }
+
+        async function editIngredient(ingredientId) {
+            closeModal(); // Close the selector modal
+            
+            try {
+                const response = await fetch('/api/ingredients');
+                const ingredients = await response.json();
+                const ingredient = ingredients.find(i => i.id === ingredientId);
+                
+                if (!ingredient) {
+                    showNotification('Ingredient not found', 'error');
+                    return;
+                }
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal">
+                        <div class="form-header">
+                            <h3>Edit Ingredient: ${ingredient.name}</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            <form onsubmit="submitEditIngredientForm(event, ${ingredientId})">
+                                <div class="form-group">
+                                    <label>Ingredient Name</label>
+                                    <input type="text" name="name" value="${ingredient.name}" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Current Stock</label>
+                                        <input type="number" name="stock" min="0" step="0.01" value="${ingredient.stock}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Unit of Measure</label>
+                                        <select name="unit" required>
+                                            <option value="kg" ${ingredient.unit === 'kg' ? 'selected' : ''}>Kilograms (kg)</option>
+                                            <option value="g" ${ingredient.unit === 'g' ? 'selected' : ''}>Grams (g)</option>
+                                            <option value="l" ${ingredient.unit === 'l' ? 'selected' : ''}>Liters (l)</option>
+                                            <option value="ml" ${ingredient.unit === 'ml' ? 'selected' : ''}>Milliliters (ml)</option>
+                                            <option value="pack" ${ingredient.unit === 'pack' ? 'selected' : ''}>Packs</option>
+                                            <option value="piece" ${ingredient.unit === 'piece' ? 'selected' : ''}>Pieces</option>
+                                            <option value="bottles" ${ingredient.unit === 'bottles' ? 'selected' : ''}>Bottles</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Cost per Unit ($)</label>
+                                        <input type="number" name="cost" step="0.01" min="0" value="${ingredient.cost}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Category</label>
+                                        <select name="category" required>
+                                            <option value="Meat" ${ingredient.category === 'Meat' ? 'selected' : ''}>Meat</option>
+                                            <option value="Vegetables" ${ingredient.category === 'Vegetables' ? 'selected' : ''}>Vegetables</option>
+                                            <option value="Dairy" ${ingredient.category === 'Dairy' ? 'selected' : ''}>Dairy</option>
+                                            <option value="Bread" ${ingredient.category === 'Bread' ? 'selected' : ''}>Bread</option>
+                                            <option value="Condiments" ${ingredient.category === 'Condiments' ? 'selected' : ''}>Condiments</option>
+                                            <option value="Beverages" ${ingredient.category === 'Beverages' ? 'selected' : ''}>Beverages</option>
+                                            <option value="Sides" ${ingredient.category === 'Sides' ? 'selected' : ''}>Sides</option>
+                                            <option value="Spices" ${ingredient.category === 'Spices' ? 'selected' : ''}>Spices</option>
+                                            <option value="Other" ${ingredient.category === 'Other' ? 'selected' : ''}>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Minimum Stock Level</label>
+                                        <input type="number" name="min_stock" step="0.01" min="0" value="${ingredient.min_stock}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Supplier</label>
+                                        <select name="supplier" required>
+                                            <option value="Sysco Food Service" ${ingredient.supplier === 'Sysco Food Service' ? 'selected' : ''}>Sysco Food Service Market</option>
+                                            <option value="PriceSmart" ${ingredient.supplier === 'PriceSmart' ? 'selected' : ''}>PriceSmart</option>
+                                            <option value="Nestle" ${ingredient.supplier === 'Nestle' ? 'selected' : ''}>Nestle Professional</option>
+                                            <option value="Unilever Food Solutions" ${ingredient.supplier === 'Unilever Food Solutions' ? 'selected' : ''}>Unilever Food Solutions</option>
+                                            <option value="Panama Gourmet Foods" ${ingredient.supplier === 'Panama Gourmet Foods' ? 'selected' : ''}>Panama Gourmet Foods</option>
+                                            <option value="Prolacsa" ${ingredient.supplier === 'Prolacsa' ? 'selected' : ''}>Prolacsa</option>
+                                            <option value="Local Supplier" ${ingredient.supplier === 'Local Supplier' ? 'selected' : ''}>Local Supplier</option>
+                                            <option value="Local Farm" ${ingredient.supplier === 'Local Farm' ? 'selected' : ''}>Local Farm</option>
+                                            <option value="Local Bakery" ${ingredient.supplier === 'Local Bakery' ? 'selected' : ''}>Local Bakery</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Image file (optional)</label>
+                                    <div class="file-upload-container">
+                                        <input type="file" name="image_file" accept="image/*" class="file-upload-input" onchange="previewImage(this)">
+                                        <label class="file-upload-label">
+                                            <div class="file-upload-icon">📷</div>
+                                            <div class="file-upload-text">Click to upload image</div>
+                                            <div class="file-upload-hint">JPG, PNG, GIF up to 5MB</div>
+                                        </label>
+                                    </div>
+                                    <div class="file-upload-preview" id="image-preview"></div>
+                                </div>
+                            </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Error loading ingredient details', 'error');
+            }
+        }
+
+        /**
+         * Shows the modal form for adding new dishes to the menu
+         * Creates a form with fields for:
+         * - Dish name and description
+         * - Sale price and category
+         * - Preparation time
+         * - Recipe ingredients with quantities
+         * - Optional image upload
+         */
+        function showAddDishModal() {
+            const modal = document.createElement('div');
+            modal.className = 'form-overlay';
+            modal.innerHTML = `
+                <div class="form-modal">
+                    <div class="form-header">
+                        <h3>Add New Dish</h3>
+                        <button class="btn-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="form-content">
+                        <form onsubmit="submitDishForm(event)">
+                            <div class="form-group">
+                                <label>Dish Name</label>
+                                <input type="text" name="name" placeholder="e.g., Classic Burger" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="description" rows="3" placeholder="Describe the dish..."></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Sale Price ($)</label>
+                                    <input type="number" name="sale_price" min="0" step="0.01" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Burgers">Burgers</option>
+                                        <option value="Sandwiches">Sandwiches</option>
+                                        <option value="Wraps">Wraps</option>
+                                        <option value="Pizza">Pizza</option>
+                                        <option value="Main Course">Main Course</option>
+                                        <option value="Salads">Salads</option>
+                                        <option value="Hot Dogs">Hot Dogs</option>
+                                        <option value="Mexican">Mexican</option>
+                                        <option value="Sides">Sides</option>
+                                        <option value="Beverages">Beverages</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Preparation Time (minutes)</label>
+                                    <input type="number" name="prep_time" min="1" placeholder="10" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Image file (optional)</label>
+                                    <div class="file-upload-container">
+                                        <input type="file" name="image_file" accept="image/*" class="file-upload-input" onchange="previewImage(this)">
+                                        <label class="file-upload-label">
+                                            <div class="file-upload-icon">📷</div>
+                                            <div class="file-upload-text">Click to upload image</div>
+                                            <div class="file-upload-hint">JPG, PNG, GIF up to 5MB</div>
+                                        </label>
+                                    </div>
+                                    <div class="file-upload-preview" id="image-preview"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Recipe Ingredients</label>
+                                <div id="recipe-ingredients">
+                                    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                        <select name="ingredient_id[]" style="flex: 2;" required>
+                                            <option value="">Select ingredient...</option>
+                                        </select>
+                                        <input type="number" name="quantity[]" placeholder="Quantity" min="0" step="0.01" style="flex: 1;" required>
+                                        <button type="button" onclick="removeIngredientRow(this)" class="btn-outline">Remove</button>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="addIngredientRow()" class="btn-secondary">Add Ingredient</button>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" onclick="closeModal()" class="btn-outline">Cancel</button>
+                                <button type="submit" class="btn-primary">Add Dish</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            loadIngredientOptions();
+        }
+
+        async function editDish(dishId) {
+            try {
+                const response = await fetch('/api/dishes');
+                const dishes = await response.json();
+                const dish = dishes.find(d => d.id === dishId);
+                
+                if (!dish) {
+                    showNotification('Dish not found', 'error');
+                    return;
+                }
+                
+                const modal = document.createElement('div');
+                modal.className = 'form-overlay';
+                modal.innerHTML = `
+                    <div class="form-modal">
+                        <div class="form-header">
+                            <h3>Edit Dish: ${dish.name}</h3>
+                            <button class="btn-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="form-content">
+                            <form onsubmit="submitEditDishForm(event, ${dishId})">
+                                <div class="form-group">
+                                    <label>Dish Name</label>
+                                    <input type="text" name="name" value="${dish.name}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea name="description" rows="3">${dish.description || ''}</textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Sale Price ($)</label>
+                                        <input type="number" name="sale_price" min="0" step="0.01" value="${dish.sale_price}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Category</label>
+                                        <select name="category" required>
+                                            <option value="Burgers" ${dish.category === 'Burgers' ? 'selected' : ''}>Burgers</option>
+                                            <option value="Sandwiches" ${dish.category === 'Sandwiches' ? 'selected' : ''}>Sandwiches</option>
+                                            <option value="Wraps" ${dish.category === 'Wraps' ? 'selected' : ''}>Wraps</option>
+                                            <option value="Pizza" ${dish.category === 'Pizza' ? 'selected' : ''}>Pizza</option>
+                                            <option value="Main Course" ${dish.category === 'Main Course' ? 'selected' : ''}>Main Course</option>
+                                            <option value="Salads" ${dish.category === 'Salads' ? 'selected' : ''}>Salads</option>
+                                            <option value="Hot Dogs" ${dish.category === 'Hot Dogs' ? 'selected' : ''}>Hot Dogs</option>
+                                            <option value="Mexican" ${dish.category === 'Mexican' ? 'selected' : ''}>Mexican</option>
+                                            <option value="Sides" ${dish.category === 'Sides' ? 'selected' : ''}>Sides</option>
+                                            <option value="Beverages" ${dish.category === 'Beverages' ? 'selected' : ''}>Beverages</option>
+                                            <option value="Other" ${dish.category === 'Other' ? 'selected' : ''}>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Preparation Time (minutes)</label>
+                                        <input type="number" name="prep_time" min="1" value="${dish.prep_time}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Image URL (optional)</label>
+                                        <input type="url" name="image_url" value="${dish.image_url || ''}" placeholder="images/dishes/dish_name.jpg">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Recipe Ingredients</label>
+                                    <div id="recipe-ingredients">
+                                        ${dish.recipe.map(r => `
+                                            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                                <select name="ingredient_id[]" style="flex: 2;" required>
+                                                    <option value="${r.ingredient_id}" selected>${r.ingredient_name}</option>
+                                                </select>
+                                                <input type="number" name="quantity[]" placeholder="Quantity" min="0" step="0.01" style="flex: 1;" value="${r.quantity}" required>
+                                                <button type="button" onclick="removeIngredientRow(this)" class="btn-outline">Remove</button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button type="button" onclick="addIngredientRow()" class="btn-secondary">Add Ingredient</button>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" onclick="closeModal()" class="btn-outline">Cancel</button>
+                                    <button type="submit" class="btn-primary">Update Dish</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                loadIngredientOptions();
+            } catch (error) {
+                showNotification('Error loading dish details', 'error');
+            }
+        }
+
+        /**
+         * Adds a new ingredient row to the recipe form
+         * Creates a new row with ingredient selector, quantity input, and remove button
+         * Used when building dish recipes with multiple ingredients
+         */
+        function addIngredientRow() {
+            const container = document.getElementById('recipe-ingredients');
+            // Create new row element with proper styling
+            const newRow = document.createElement('div');
+            newRow.style.cssText = 'display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;';
+            newRow.innerHTML = `
+                <select name="ingredient_id[]" style="flex: 2;" required>
+                    <option value="">Select ingredient...</option>
+                </select>
+                <input type="number" name="quantity[]" placeholder="Quantity" min="0" step="0.01" style="flex: 1;" required>
+                <button type="button" onclick="removeIngredientRow(this)" class="btn-outline">Remove</button>
+            `;
+            container.appendChild(newRow);
+            loadIngredientOptions();
+        }
+
+        /**
+         * Removes an ingredient row from the recipe form
+         * Deletes the entire row when user clicks remove button
+         * @param {HTMLElement} button - The remove button element
+         */
+        function removeIngredientRow(button) {
+            button.parentElement.remove();
+        }
+
+        /**
+         * Loads ingredient options for recipe forms
+         * Fetches ingredients from API if not already loaded
+         * Populates all ingredient select dropdowns in recipe forms
+         * Ensures ingredient data is available for dish creation/editing
+         */
+        async function loadIngredientOptions() {
+            // Load ingredients from API if not already cached
+            if (ingredients.length === 0) {
+                const response = await fetch('/api/ingredients');
+                ingredients = await response.json();
+            }
+            
+            const selects = document.querySelectorAll('select[name="ingredient_id[]"]');
+            selects.forEach(select => {
+                if (select.options.length <= 1) {
+                    ingredients.forEach(ing => {
+                        const option = document.createElement('option');
+                        option.value = ing.id;
+                        option.textContent = `${ing.name} (${ing.unit})`;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        /**
+         * Handles the submission of new ingredient forms
+         * Collects form data and sends POST request to API
+         * Processes the response and shows appropriate notifications
+         * Refreshes dashboard if successful
+         * @param {Event} event - Form submission event
+         */
+        async function submitIngredientForm(event) {
+            event.preventDefault();
+            // Extract form data from the submitted form
+            const formData = new FormData(event.target);
+            
+            const data = {
+                name: formData.get('name'),
+                stock: parseFloat(formData.get('stock')),
+                unit: formData.get('unit'),
+                cost: parseFloat(formData.get('cost')),
+                category: formData.get('category'),
+                image_url: formData.get('image_url'),
+                min_stock: parseFloat(formData.get('min_stock')),
+                supplier: formData.get('supplier')
+            };
+
+            try {
+                const response = await fetch('/api/ingredients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeModal();
+                    if (currentTab === 0) renderDashboard();
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Connection error', 'error');
+            }
+        }
+
+        async function submitEditIngredientForm(event, ingredientId) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const data = {
+                name: formData.get('name'),
+                stock: parseFloat(formData.get('stock')),
+                unit: formData.get('unit'),
+                cost: parseFloat(formData.get('cost')),
+                category: formData.get('category'),
+                image_url: formData.get('image_url'),
+                min_stock: parseFloat(formData.get('min_stock')),
+                supplier: formData.get('supplier')
+            };
+
+            try {
+                const response = await fetch(`/api/ingredients/${ingredientId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeModal();
+                    if (currentTab === 0) renderDashboard();
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Connection error', 'error');
+            }
+        }
+
+        /**
+         * Handles the submission of new dish forms
+         * Collects form data including recipe ingredients
+         * Sends POST request to API to create new dish
+         * Processes the response and shows appropriate notifications
+         * Refreshes dishes view if successful
+         * @param {Event} event - Form submission event
+         */
+        async function submitDishForm(event) {
+            event.preventDefault();
+            // Extract form data from the submitted form
+            const formData = new FormData(event.target);
+            
+            const ingredientIds = formData.getAll('ingredient_id[]');
+            const quantities = formData.getAll('quantity[]');
+            
+            const recipe = ingredientIds.map((id, index) => ({
+                ingredient_id: parseInt(id),
+                quantity: parseFloat(quantities[index])
+            })).filter(r => r.ingredient_id && r.quantity > 0);
+            
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                sale_price: parseFloat(formData.get('sale_price')),
+                category: formData.get('category'),
+                image_url: formData.get('image_url'),
+                prep_time: parseInt(formData.get('prep_time')),
+                recipe: recipe
+            };
+
+            try {
+                const response = await fetch('/api/dishes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeModal();
+                    renderDishes();
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Connection error', 'error');
+            }
+        }
+
+        async function submitEditDishForm(event, dishId) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const ingredientIds = formData.getAll('ingredient_id[]');
+            const quantities = formData.getAll('quantity[]');
+            
+            const recipe = ingredientIds.map((id, index) => ({
+                ingredient_id: parseInt(id),
+                quantity: parseFloat(quantities[index])
+            })).filter(r => r.ingredient_id && r.quantity > 0);
+            
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                sale_price: parseFloat(formData.get('sale_price')),
+                category: formData.get('category'),
+                image_url: formData.get('image_url'),
+                prep_time: parseInt(formData.get('prep_time')),
+                recipe: recipe
+            };
+
+            try {
+                const response = await fetch(`/api/dishes/${dishId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    closeModal();
+                    renderDishes();
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Connection error', 'error');
+            }
+        }
+
+        /**
+         * Deletes an ingredient from the inventory after user confirmation
+         * Sends DELETE request to API and handles the response
+         * Shows success/error notifications and refreshes view if needed
+         * @param {number} id - ID of the ingredient to delete
+         */
+        async function deleteIngredient(id) {
+            // Ask for user confirmation before deletion
+            if (confirm('Are you sure you want to delete this ingredient? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/api/ingredients/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        closeModal();
+                        if (currentTab === 0) renderDashboard();
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    showNotification('Connection error', 'error');
+                }
+            }
+        }
+
+        /**
+         * Deletes a dish from the menu after user confirmation
+         * Sends DELETE request to API and handles the response
+         * Shows success/error notifications and refreshes dishes view
+         * @param {number} id - ID of the dish to delete
+         */
+        async function deleteDish(id) {
+            // Ask for user confirmation before deletion
+            if (confirm('Are you sure you want to delete this dish? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/api/dishes/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        renderDishes();
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    showNotification('Connection error', 'error');
+                }
+            }
+        }
+
+        /**
+         * Adds a dish to the shopping cart for order preparation
+         * @param {number} id - ID of the dish to add to cart
+         */
+        async function prepareDish(id) {
+            try {
+                const response = await fetch('/api/dishes');
+                const dishes = await response.json();
+                const dish = dishes.find(d => d.id === id);
+                
+                if (dish) {
+                    addToCart(dish);
+                } else {
+                    showNotification('Dish not found', 'error');
+                }
+            } catch (error) {
+                showNotification('Error adding dish to cart', 'error');
+            }
+        }
+
+        /**
+         * Closes any open modal by removing it from the DOM
+         * Finds the modal overlay and removes it completely
+         * Used by all modal forms and dialogs
+         */
+        function closeModal() {
+            const modal = document.querySelector('.form-overlay');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        /**
+         * Shows a temporary notification message to the user
+         * Creates a styled notification that auto-disappears after 3 seconds
+         * Supports different types: success, error, warning
+         * @param {string} message - Text to display
+         * @param {string} type - Notification type (success, error, warning)
+         */
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Search and filter functionality
+        /**
+         * Filters dashboard content based on search query
+         * Searches through ingredients, dishes, and suppliers
+         * @param {string} query - Search term entered by user
+         */
+        function filterDashboardContent(query) {
+            const searchTerm = query.toLowerCase().trim();
+            
+            // Filter inventory cards
+            const inventoryCards = document.querySelectorAll('.inventory-info-card');
+            inventoryCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                const isVisible = searchTerm === '' || cardText.includes(searchTerm);
+                card.style.display = isVisible ? 'block' : 'none';
+            });
+            
+            // Filter low stock items
+            const lowStockItems = document.querySelectorAll('.chart-card');
+            lowStockItems.forEach(item => {
+                const itemText = item.textContent.toLowerCase();
+                const isVisible = searchTerm === '' || itemText.includes(searchTerm);
+                item.style.display = isVisible ? 'block' : 'none';
+            });
+        }
+
+        /**
+         * Filters dishes content based on search query
+         * Searches through dish names, categories, and ingredients
+         * @param {string} query - Search term entered by user
+         */
+        function filterDishesContent(query) {
+            const searchTerm = query.toLowerCase().trim();
+            
+            // Filter dish cards
+            const dishCards = document.querySelectorAll('.dish-card');
+            dishCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                const isVisible = searchTerm === '' || cardText.includes(searchTerm);
+                card.style.display = isVisible ? 'block' : 'none';
+            });
+            
+            // Update dishes count display
+            const visibleDishes = Array.from(dishCards).filter(card => card.style.display !== 'none');
+            const countDisplay = document.querySelector('.section-header h2');
+            if (countDisplay) {
+                countDisplay.textContent = `Restaurant Menu (${visibleDishes.length} dishes)`;
+            }
+        }
+
+        /**
+         * Filters inventory content based on search query
+         * Searches through ingredient names, categories, and suppliers
+         * @param {string} query - Search term entered by user
+         */
+        function filterInventoryContent(query) {
+            const searchTerm = query.toLowerCase().trim();
+            
+            // Filter inventory cards
+            const inventoryCards = document.querySelectorAll('.inventory-card');
+            inventoryCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                const isVisible = searchTerm === '' || cardText.includes(searchTerm);
+                card.style.display = isVisible ? 'block' : 'none';
+            });
+        }
+
+
+
+        // Utility functions for data management and user interaction
+        /**
+         * Exports all application data to a JSON file
+         * Includes ingredients, dishes, distributors, and metadata
+         * Creates a downloadable file with timestamp and restaurant name
+         */
+        function exportData() {
+            const data = {
+                ingredients: ingredients,
+                dishes: dishes,
+                distributors: distributors,
+                exportDate: new Date().toISOString(),
+                restaurant: 'Foodwizz Food Truck'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `foodwizz-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Data exported successfully!', 'success');
+        }
+
+        /**
+         * Exports business analytics and reports to a JSON file
+         * Includes sales data, inventory metrics, and business insights
+         * Creates a downloadable report with current date and restaurant information
+         */
+        function exportReport() {
+            const reportData = {
+                date: new Date().toISOString(),
+                restaurant: 'Foodwizz Food Truck',
+                sales: { 
+                    total: 12450, 
+                    orders: 156, 
+                    average: 79.81,
+                    topDishes: ['Classic Burger', 'Chicken Wrap', 'BBQ Ribs']
+                },
+                inventory: { 
+                    lowStock: 8, 
+                    outOfStock: 3, 
+                    wellStocked: 25,
+                    totalValue: 16500
+                },
+                suppliers: distributors.length
+            };
+            
+            const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `foodwizz-report-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Report exported successfully!', 'success');
+        }
+
+        /**
+         * Loads sample data for demonstration purposes
+         * Prompts user for confirmation before loading example data
+         * Shows success notification when completed
+         */
+        function loadSampleData() {
+            if (confirm('Load sample data? This will add example ingredients and dishes to your system.')) {
+                showNotification('Sample data loaded successfully!', 'success');
+            }
+        }
+
+        /**
+         * Clears all application data after user confirmation
+         * Prompts user for confirmation before clearing
+         * Shows warning notification about upcoming feature
+         */
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                showNotification('Clear data feature coming soon!', 'warning');
+            }
+        }
+    </script>
+</body>
+</html>

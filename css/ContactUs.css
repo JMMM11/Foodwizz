@@ -1,0 +1,158 @@
+.contact-section {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 50px;
+  margin-top: 5%;
+}
+
+/* ============= Contact Form ============= */
+.contact-form {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+  flex: 2;
+}
+
+.contact-form h2 {
+  margin-bottom: 10px;
+}
+
+.contact-form p {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.contact-form input, 
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.contact-form textarea {
+  min-height: 120px;
+  resize: none;
+}
+
+.contact-form button {
+  background: orange;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.contact-form button:hover {
+  background: #e69500;
+}
+
+/* ============= Department Cards ============= */
+.departments {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+  align-items: center;
+  gap: 10%;
+  border-left: 4px solid orange;
+}
+
+.card img {
+  width: 40px;
+  height: 40px;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.card p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* ============= Map ============= */
+.laptop-container {
+  position: relative;
+  width: 800px;
+  margin: auto;
+}
+
+.laptop-image {
+  width: 150%;
+  display: block;
+  margin-left: -150px;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 16%;   /* Ajusta según el diseño de la laptop */
+  left: 41%;  /* Ajusta según el diseño de la laptop */
+  width: 76%; /* Ajusta según el tamaño de la pantalla */
+  height: 65%;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.backpic2 {
+  background-image: url('/assets/img/compu.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 60px 20px;
+  margin-top: -40px;
+}
+
+/* ============= Responsive ============= */
+@media (max-width: 768px) {
+    .faq-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .faq-accordion .accordion-button {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .faq-accordion .accordion-body {
+        padding: 1rem;
+    }
+}
+
+.bannercontact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 8px; 
+    margin-left: 40px;
+    margin-right: 40px;
+}
